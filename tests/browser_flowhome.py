@@ -62,6 +62,17 @@ CONTRAST = """() => { const parse = (s) => (s.match(/[\\d.]+/g) || []).map(Numbe
            stageLum: lum(bgOf(document.querySelector('.stage'))) }; }"""
 
 
+HERO_ANIMS = """() => { const a = document.getAnimations().filter((x) => x.effect && x.effect.target && x.effect.target.closest && x.effect.target.closest('.hero-demo')
+    && x.animationName && x.animationName.startsWith('a-') && x.animationName !== 'a-march');
+  const t = a.map((x) => x.effect.getTiming());
+  return { n: a.length, durations: [...new Set(t.map((x) => x.duration))], delays: [...new Set(t.map((x) => x.delay))] }; }"""
+HERO_STILL = """() => { const q = (s) => [...document.querySelectorAll('.hero-demo ' + s)];
+  const shown = (e) => parseFloat(getComputedStyle(e).opacity) === 1;
+  const nodes = q('.node').filter(shown).length, lines = q('.wipe').filter((r) => { const m = getComputedStyle(r).transform; return m === 'none' || m === 'matrix(1, 0, 0, 1, 0, 0)'; }).length;
+  const edges = q('.edge').filter((e) => parseFloat(getComputedStyle(e).strokeDashoffset) === 0).length;
+  return { nodes, lines, edges, ok: nodes === 5 && lines === 5 && edges === 4 && document.getAnimations().filter((x) => x.effect?.target?.closest?.('.hero-demo')).length <= 1 }; }"""
+
+
 def focus_ring_missing(pg, n=30):
     """กด Tab ทีละครั้ง ทุกจุดที่โฟกัสได้ต้องเห็นว่าโฟกัสอยู่ตรงไหน
     ‼️ กรอบอาจอยู่ที่ตัวเองหรือกล่องแม่ (ช่องค้นหาใช้ :focus-within ที่กล่อง .search) จึงเทียบหน้าตาตอนโฟกัสกับตอนไม่โฟกัส
@@ -112,6 +123,10 @@ def selftest(b):
       e.style.outline = 'none'; e.style.boxShadow = 'none'; e.style.borderColor = s.borderColor; e.style.backgroundColor = s.backgroundColor; })""")
     miss, n = focus_ring_missing(pg, 8)
     ck("ไม่มีกรอบโฟกัส จับได้", n >= 3 and len(miss) == n, f"{len(miss)}/{n}")
+    ctx.close()
+    ctx = b.new_context(viewport={"width": 1440, "height": 900}, reduced_motion="reduce"); pg = ctx.new_page(); pg.goto(HOME); home_ready(pg)
+    pg.evaluate("() => { document.querySelector('.hero-demo .n3').style.opacity = '0'; }")
+    ck("ภาพนิ่งขาดกล่องหนึ่งใบ จับได้", not pg.evaluate(HERO_STILL)["ok"])
     ctx.close()
 
 
@@ -203,7 +218,7 @@ def main():
         ck("ไม่เลื่อนข้าง", pg.evaluate(OVERFLOW) <= 0, f"{pg.evaluate(OVERFLOW)} px")
         ck("การ์ดสองคอลัมน์", pg.evaluate(TWO_COLS))
         ck("ประตูไป FileKit โผล่และชี้ /filekit/", pg.is_visible("a.door") and pg.get_attribute("a.door", "href") == "/filekit/")
-        ck("ภาพผังไอโซเมตริกกับแถบเว็บในเครือซ่อนบนจอแคบ", not pg.is_visible(".flow-obj") and not pg.is_visible("nav.network"))
+        ck("ภาพหัวเว็บกับแถบเว็บในเครือซ่อนบนจอแคบ", not pg.is_visible(".hero-demo") and not pg.is_visible("nav.network"))
         wrap = pg.evaluate("""() => [...document.querySelectorAll('#tools a.pill .w')].filter((w) => w.getClientRects().length > 1).map((w) => w.textContent)""")
         ck("ชื่อการ์ดไม่ขาดกลางวลี (ตัดบรรทัดได้แค่ที่ช่องว่าง)", not wrap, str(wrap))
         ctx.close()
@@ -217,6 +232,18 @@ def main():
             ck(f"ธีม{'มืด' if scheme == 'dark' else 'สว่าง'} ตัวหนังสือการ์ดกับปุ่มหมวดอ่านออก (≥4.5:1)",
                c["card"] >= 4.5 and c["cat"] >= 4.5, json.dumps({k: round(v, 2) for k, v in c.items()}))
             ctx.close()
+
+        # ── ⑦.5 ภาพหัวเว็บ พิมพ์แล้วกลายเป็นผัง (พี่ปอนด์เลือก 22/09/2026) ──
+        print("\n━━ ⑦.5 ภาพหัวเว็บ ━━")
+        ctx = b.new_context(viewport={"width": 1440, "height": 900}); pg = ctx.new_page(); pg.goto(HOME); home_ready(pg)
+        anim = pg.evaluate(HERO_ANIMS)
+        ck("ภาพหัวเว็บเคลื่อนไหว ทุกชิ้นวนเท่ากัน 7 วินาที ไม่มี delay (ฉากเดียวกันไม่หลุดจังหวะ)",
+           anim["n"] >= 15 and anim["durations"] == [7000] and anim["delays"] == [0], json.dumps(anim, ensure_ascii=False))
+        ctx.close()
+        ctx = b.new_context(viewport={"width": 1440, "height": 900}, reduced_motion="reduce"); pg = ctx.new_page(); pg.goto(HOME); home_ready(pg)
+        still = pg.evaluate(HERO_STILL)
+        ck("‼️ เครื่องที่ตั้งลดการเคลื่อนไหว เห็นผังนิ่งที่ครบ (กล่อง 5 บรรทัด 5 เส้น 4)", still["ok"], json.dumps(still, ensure_ascii=False))
+        ctx.close()
 
         # ── ⑧ กดการ์ดทุกใบ หน้าวาดเปิดของนั้นจริง ──
         print("\n━━ ⑧ กดการ์ดทุกใบ ━━")
