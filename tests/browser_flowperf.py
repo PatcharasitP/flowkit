@@ -30,6 +30,16 @@ def ck(name, ok, detail=""):
     return ok
 
 
+def load1():
+    """ภาระเครื่องนาทีล่าสุด ‼️ วัดเวลาเปิดหน้าตอนเครื่องไม่ว่าง = ตัวเลขไม่จริง
+    (23/09/2026 วัดเว็บจริงตอนตัวถอดเสียงคลิปทำงานอยู่ ได้ 980 กับ 1231 ms ตอนเครื่องว่างได้ 608 กับ 612 ms)
+    เจอเครื่องไม่ว่าง = แดงพร้อมบอกวิธี ไม่ปล่อยให้ตัวเลขผิดผ่านไปเงียบ ๆ"""
+    try:
+        with open("/proc/loadavg") as f: return float(f.read().split()[0])
+    except Exception:
+        return 0.0
+
+
 def outside(urls):
     """คำขอที่ออกนอกโดเมนตัวเอง (หน้าแรกต้องไม่คุยกับใครนอกจาก patcharasitp.github.io)"""
     return [u for u in urls if u.startswith("http") and not u.startswith(ORIGIN)]
@@ -71,12 +81,20 @@ def main():
         ck(f"หน้าไม่กระตุกตอนโหลด CLS {m['cls']:.3f} ไม่เกิน {BUDGET['cls']}", m["cls"] <= BUDGET["cls"])   # CLS จริงเป็นศูนย์ งบศูนย์จึงไม่ทำให้แดง ไม่นับใน selftest
 
         print("\n━━ เวลาเปิดบนเน็ตมือถือช้า (ซีพียูช้า 4 เท่า , 150 ms , 1.6 Mbps) รันเดี่ยว ━━")
+        busy = load1()
+        ck(f"เครื่องว่างพอจะวัดเวลา (ภาระ {busy:.1f} ไม่เกิน 2.5)", busy <= 2.5 or SELFTEST,
+           "พักงานเบื้องหลังก่อน เช่น แตะไฟล์ .claude/research/drawio-youtube/PAUSE เพื่อพักตัวถอดเสียงคลิป แล้วรันใหม่")
         runs = [load(b, True, True)[0] for _ in range(3)]
         fcp = statistics.median(r["fcp"] for r in runs); cards = statistics.median(r["cards"] for r in runs)
         ck(f"เห็นหน้า {fcp:.0f} ms ไม่เกิน {budget['fcp']} ms", fcp <= budget["fcp"], str([r["fcp"] for r in runs]))
         ck(f"การ์ดขึ้น {cards:.0f} ms ไม่เกิน {budget['cards']} ms", cards <= budget["cards"], str([r["cards"] for r in runs]))
+        # ‼️ ตัวเลขที่กระจายมาก = เครื่องไม่นิ่ง (มีงานอื่นแย่งซีพียู) ค่ากลางเชื่อไม่ได้ ต้องวัดใหม่ตอนเครื่องว่าง
+        #    ภาระเครื่องอย่างเดียวจับไม่อยู่ (23/09/2026 ภาระอ่านได้ 1.3 ทั้งที่ตัวถอดเสียงทำงานอยู่)
+        spread = [(max(x) - min(x)) / max(statistics.median(x), 1) for x in ([r["fcp"] for r in runs], [r["cards"] for r in runs])]
+        ck(f"สามรอบที่วัดนิ่งพอ (กระจาย {max(spread) * 100:.0f}% ไม่เกิน 30%)", max(spread) <= 0.30 or SELFTEST,
+           f"เห็นหน้า {[r['fcp'] for r in runs]} การ์ด {[r['cards'] for r in runs]} , พักงานเบื้องหลังแล้ววัดใหม่")
         b.close()
-    rec = {"fcp_ms": fcp, "cards_ms": cards, "requests": len(net), "js_bytes": js, "cls": round(m["cls"], 4)}
+    rec = {"fcp_ms": fcp, "cards_ms": cards, "requests": len(net), "js_bytes": js, "cls": round(m["cls"], 4), "load": round(busy, 2)}
     print("\nบันทึก:", json.dumps(rec, ensure_ascii=False))
     return finish()
 
@@ -85,7 +103,7 @@ def finish():
     print("\n" + "━" * 62)
     if SELFTEST:
         # ‼️ ตั้งงบเป็นศูนย์ ข้อที่มีตัวเลขจริงมากกว่าศูนย์ต้องแดงทุกข้อ ข้อโดเมนต้องแดงเพราะแทรกโดเมนอื่นเอง
-        ok = len(F) >= 7
+        ok = len(F) >= 7      # ข้อเครื่องว่างไม่นับใน selftest (ยกเว้นไว้) งบศูนย์ทำให้ข้ออื่นแดงครบ
         print(f"selftest: แดง {len(F)} ข้อจากงบศูนย์และโดเมนปลอม " + ("✅ ตัวตรวจจับได้" if ok else "❌ ตัวตรวจไม่แดงตามที่ควร"))
         return 0 if ok else 1
     print(f"ผ่าน {P} ข้อ, ตก {len(F)} ข้อ")
