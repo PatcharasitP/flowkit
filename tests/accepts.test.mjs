@@ -198,6 +198,11 @@ async function main() {
   const draw = colorDiff(fkcss, rd("draw/draw.css"), false);
   ck(draw.compared >= 12 && !draw.out.length, `draw.css ตัวแปรสีที่ชื่อซ้ำตรงกับ FileKit (เทียบ ${draw.compared} ตัว)`, draw.out.slice(0, 4).join("\n      "));
   ck(/url\("\/filekit\/vendor\/fonts\/Sarabun-Regular\.woff2"\)/.test(rd("home.css")), "home.css ฟอนต์ชี้ /filekit/vendor/fonts/");
+  /* ‼️ โลโก้หัวเว็บของ FlowKit เป็นม่วง ไม่ใช่สี่เหลี่ยมสีเดียวกับ FileKit (พี่ปอนด์ 23/09/2026) สองหน้าต้องสีเดียวกัน */
+  const markBg = (f) => [...rd(f).matchAll(/\.brand \.mark\{[^}]*background:([^;}]+)/g)].map((m) => m[1].trim());
+  const violet = (f) => markBg(f).filter((v) => v.startsWith("#")).join(",");
+  ck(violet("home.css") === "#6c4fd1,#7c5ce0,#7c5ce0" && violet("draw/draw.css") === "#6c4fd1,#7c5ce0,#7c5ce0",
+     `โลโก้หัวเว็บทั้งสองหน้าประกาศสีม่วงชุดเดียวกัน (${violet("home.css")} , ${violet("draw/draw.css")})`);
 
   console.log("\n━━ ⑤ แถบเว็บในเครือ ตรงกับหน้าแรก FileKit ━━");
   const fknav = navOf(fkhtml, "https://patcharasitp.github.io/filekit/");

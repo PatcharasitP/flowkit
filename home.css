@@ -379,7 +379,8 @@ a.pill,a.brand{text-decoration:none}
 
 /* ── ภาพหัวเว็บ: โลโก้ FlowKit 3 มิติ (พี่ปอนด์เคาะ 23/09/2026) วัสดุเดียวกับปึกกระดาษของ FileKit
    ‼️ ห้าม filter หรือ opacity ที่ .hero3d (ฉาก 3 มิติจะถูกแบนทิ้ง) , ของที่ขยับทุกเฟรมเป็น transform เท่านั้น
-   จุดแสงในท่อเป็น SMIL ใน SVG (ไม่ใช่ JS) , ลดการเคลื่อนไหว = นิ่งและซ่อนจุดแสง ── */
+   จุดแสงในท่อเป็น SMIL ใน SVG (ไม่ใช่ JS) , ลดการเคลื่อนไหว = นิ่งและซ่อนจุดแสง
+   ‼️ เคยมีกล่องที่สองลอยขึ้นตอนแสงถึง (c-lift) พี่ปอนด์สั่งเอาออก 23/09/2026 "เอาแค่วิ่ง ๆ พอ ไม่ต้องยกขึ้น" ── */
 .hero3d{position:relative; height:clamp(190px,22vw,290px); display:grid; place-items:center; perspective:1200px; perspective-origin:52% 42%;
   transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg)); transition:transform 280ms var(--ease)}
 .hero3d::before{content:""; position:absolute; width:86%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle, rgba(150,170,255,.28), rgba(150,170,255,0) 66%)}
@@ -404,9 +405,13 @@ a.pill,a.brand{text-decoration:none}
 .hero3d-c .wire{transform:translateZ(var(--z,10px))} .hero3d-c .w1{--z:4px} .hero3d-c .w2{--z:8px} .hero3d-c .w3{--z:12px}
 .hero3d-c .pipe{fill:none; stroke-width:4; stroke-linecap:round; stroke-linejoin:round} .hero3d-c .w1 .pipe{stroke:#4c5468} .hero3d-c .w2 .pipe{stroke:#7d879e} .hero3d-c .w3 .pipe{stroke:url(#wm)}
 .hero3d-c .spark{mix-blend-mode:normal}
-.hero3d-c .t2{animation:c-lift 4.8s cubic-bezier(.3,.7,.2,1) infinite}
-@keyframes c-lift{0%,35.0%{transform:translateZ(0)} 44.0%{transform:translateZ(16px)} 70.0%{transform:translateZ(16px)} 96%,100%{transform:translateZ(0)}}
 .hero3d-c .t2 .face::after{animation-delay:-3s}
+
+/* ‼️ โลโก้บนหัวเว็บเป็นม่วงของ FlowKit (พี่ปอนด์ 23/09/2026 "สีดำทั้งคู่เลย ไอคอนอ่ะ" = เดิมเป็นสี่เหลี่ยมสีเดียวกับ FileKit ทั้งสองเว็บ)
+   FileKit = สี่เหลี่ยมเข้มตัว F , FlowKit = สี่เหลี่ยมม่วงกล่องสองกล่อง ให้ตรงกับไอคอนแท็บ (assets/icons/favicon.svg) */
+.brand .mark{background:#6c4fd1; color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .brand .mark{background:#7c5ce0} }
+:root[data-theme="dark"] .brand .mark{background:#7c5ce0}
 
 /* หน้า 404 ใช้ไฟล์นี้ร่วม */
 .notfound{max-width:var(--page-w); margin:0 auto; padding:clamp(40px,12vh,140px) var(--page-pad)}
