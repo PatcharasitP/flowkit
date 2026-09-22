@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<style>
+.bg{fill:#eef0fb}
+.box{fill:#2f3ea3}
+.wire{fill:none;stroke:#6c4fd1;stroke-width:3.4;stroke-linecap:round}
+@media (prefers-color-scheme: dark){
+.bg{fill:#12142a}
+.box{fill:#eef1ff}
+.wire{stroke:#9d7bff}
+}
+</style>
+<rect class="bg" width="48" height="48" rx="9"/>
+<g transform="translate(0 2.5)">
+<rect class="box" x="7" y="7" width="15" height="12" rx="3.2"/>
+<path class="wire" d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5"/>
+<rect class="box" x="26" y="24" width="15" height="12" rx="3.2"/>
+</g>
+</svg>
