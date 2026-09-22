@@ -3,12 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>ไม่พบหน้านี้ FlowKit</title>
 <meta name="robots" content="noindex">
+<link rel="icon" href="/flowkit/assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/flowkit/home.css">
 </head>
 <body>
-<p>ไม่พบหน้านี้ <a href="/flowkit/">กลับหน้าแรก FlowKit</a></p>
-<p lang="en">Page not found. <a href="/flowkit/">Back to FlowKit</a></p>
+<main class="notfound">
+  <p class="trust-eye">404</p>
+  <h1 class="trust-h" lang="th">ไม่พบหน้านี้</h1>
+  <p lang="en">Page not found</p>
+  <p><a href="/flowkit/" lang="th">กลับหน้าแรก FlowKit</a> <span lang="en">(<a href="/flowkit/">Back to FlowKit</a>)</span></p>
+</main>
 </body>
 </html>

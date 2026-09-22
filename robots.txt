@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://patcharasitp.github.io/flowkit/sitemap.xml

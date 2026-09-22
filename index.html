@@ -2,14 +2,169 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- หน้าแรก FlowKit (แผนเว็บ FlowKit แยก ข้อ 4 , 22/09/2026) โครงและหน้าตาลอกจากหน้าแรก FileKit ที่ใช้งานจริง
+     ‼️ CSP เข้มกว่าหน้าแรก FileKit: ไม่มี unsafe-inline ทั้งสคริปต์และสไตล์ ไม่มี CDN ไม่มี frame
+        CSS อยู่ไฟล์ home.css (วัดแล้วเปิดช้ากว่าฝัง ~0.2 วินาทีบนเน็ตมือถือช้า ต่ำกว่าเพดาน 1 วินาทีของแผน)
+     ‼️ sha256 สามตัวคือสคริปต์ก่อนวาดจอ: ฟอนต์ , ธีม , ภาษา (สองตัวหลังต้องตรงกับหน้าแรก FileKit ทุกตัวอักษร)
+        แก้สคริปต์ตัวไหนต้องคำนวณ hash ใหม่ tests/accepts.test.mjs คำนวณเองแล้วเทียบ ไม่ต้องจำ
+     ‼️ ห้ามใส่ style="..." ในแท็ก (CSP บล็อก) สีประจำหมวดใช้ data-kind ใน home.css -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'sha256-Y2hdOidNsANYBUx5JaURPnuOobBXP9z7gW8rW5Kw3YU=' 'sha256-Cc0W0CwhZzN7hIDklSuJ+Qs16/OVIJT4eHeIM2+c1js=' 'sha256-+WV7M4JC5RBwOo7oWvLiLqllHEOz4BRSD1jtfIUdJHE=';
+  style-src 'self';
+  img-src 'self' data:;
+  font-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'none'">
+<title data-en="FlowKit - turn text into diagrams in your browser">FlowKit - วาดผังจากข้อความ ในเบราว์เซอร์</title>
+<meta name="description" content="พิมพ์ขั้นตอนทีละบรรทัด ได้ผังงาน ผังองค์กร ผังระบบ หรือไทม์ไลน์ มีเทมเพลตงานบริษัทไทยให้เริ่ม ดาวน์โหลดเป็นภาพวางสไลด์ได้ทันที เปิดแก้ต่อใน draw.io ได้ ข้อความไม่ออกจากเครื่อง">
+<meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
 <meta name="flowkit-version" content="flowkit-v1">
-<title>FlowKit</title>
+<!-- ‼️ preload ฟอนต์เฉพาะเน็ตเร็ว (ที่มาและตัวเลขที่วัด ดูคอมเมนต์เดียวกันในหน้าแรก FileKit 13/09 และ 19/09/2026)
+     เน็ตช้า preload แย่งโหลดกับหน้าแล้วเห็นหน้าช้าลง , เน็ตเร็ว preload กันการ์ดตกบรรทัดตอนฟอนต์มาถึง
+     ‼️ ต้องมี crossOrigin แม้ same-origin ไม่งั้นโหลดซ้ำ 2 รอบ (พิสูจน์ 22/09/2026 เฟส 0 R3) -->
+<script>var c=navigator.connection;if(c&&!c.saveData&&c.rtt<=50&&c.downlink>=5){for(const w of["Regular","SemiBold","Bold"]){const l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="/filekit/vendor/fonts/Sarabun-"+w+".woff2";document.head.appendChild(l)}}</script>
+<link rel="canonical" href="https://patcharasitp.github.io/flowkit/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FlowKit">
+<meta property="og:locale" content="th_TH">
+<meta property="og:title" content="FlowKit - วาดผังจากข้อความ ที่ไม่ส่งข้อมูลคุณไปไหน">
+<meta property="og:description" content="ผังขั้นตอน ผังองค์กร ผังระบบ ไทม์ไลน์ และ flow ของ Power Automate วาดในเบราว์เซอร์ของคุณเอง ได้ไฟล์วางสไลด์ที่เปิดแก้ต่อได้ ฟรี ไม่ต้องสมัคร">
+<meta property="og:url" content="https://patcharasitp.github.io/flowkit/">
 <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="home.css">
+<!-- ‼️ โหลดโมดูลทุกชั้นพร้อมกันตั้งแต่ต้น ไม่ต้องรอทีละชั้น (home.js → shared.js → i18n.js) วัดจริง 22/09/2026 เน็ตมือถือช้า ซีพียูช้า 4 เท่า
+     ไม่ใส่: เห็นหน้า 508 ms การ์ดขึ้น 945 ms , ใส่: เห็นหน้า 576 ms การ์ดขึ้น 589 ms หน้าขึ้นครบทีเดียว ไม่มีการ์ดโผล่ตามทีหลัง
+     ‼️ เพิ่ม import ใหม่ในโมดูลหน้าแรกต้องเพิ่มบรรทัดที่นี่ด้วย tests/browser_flowperf.py จับ -->
+<link rel="modulepreload" href="src/home.js">
+<link rel="modulepreload" href="src/shared.js">
+<link rel="modulepreload" href="src/chrome.js">
+<link rel="modulepreload" href="src/catalog.js">
+<link rel="modulepreload" href="src/templates.js">
+<link rel="modulepreload" href="/filekit/src/i18n.js">
+<!-- เลือกธีมก่อนวาดหน้าจอ กันจอกะพริบขาวดำตอนโหลด (ตัวอักษรเดียวกับหน้าแรก FileKit) -->
+<script>try{var t=localStorage.getItem("fk-theme");if(t&&t!=="auto")document.documentElement.dataset.theme=t;
+}catch(e){}</script>
 </head>
 <body>
-<!-- ชั่วคราวระหว่างเฟส 1 หน้าแรกจริงมาในเฟส 2 -->
-<p><a href="draw/">FlowKit วาดผังจากข้อความ</a></p>
+<a class="skip" href="#tools" data-en="Skip to the starting points">ข้ามไปที่จุดเริ่ม</a>
+
+<header class="top">
+  <a class="brand" href="./" aria-label="FlowKit หน้าแรก" data-en-al="FlowKit home">
+    <span class="mark"><svg class="mark-svg" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="12" rx="3.2" fill="currentColor"/><path d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><rect x="26" y="24" width="15" height="12" rx="3.2" fill="currentColor"/></svg></span>
+    <span>FlowKit</span>
+  </a>
+  <span class="spacer"></span>
+  <div class="langsw" id="lang" role="group" aria-label="เลือกภาษา" data-en-al="Choose language">
+    <button class="langopt" type="button" data-lang="th" lang="th">ไทย</button>
+    <button class="langopt" type="button" data-lang="en" lang="en">EN</button>
+  </div>
+  <button class="iconbtn" id="theme" type="button" aria-label="สลับธีม" data-en-al="Switch theme"><svg class="btn-ico th-ic th-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.6"/><path d="M12 2.4v2.6M12 19v2.6M4.2 12H1.6M22.4 12h-2.6M6.5 6.5L4.6 4.6M19.4 19.4l-1.9-1.9M17.5 6.5l1.9-1.9M4.6 19.4l1.9-1.9"/></svg><svg class="btn-ico th-ic th-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 14.2A8.6 8.6 0 0 1 9.8 3.8a8.6 8.6 0 1 0 10.4 10.4z"/></svg></button>
+</header>
+
+<main id="main">
+  <section id="home">
+    <div class="hero">
+      <div class="hero-in">
+        <div class="hero-copy">
+          <span class="kicker" data-en-html="<s></s>100% on your device"><s></s>ทำงานในเครื่องคุณ 100%</span>
+          <h1 data-en-html="Diagrams from text<br><em>that send your data nowhere</em>">วาดผังจากข้อความ<br><em>ที่ไม่ส่งข้อมูลคุณไปไหน</em></h1>
+          <div class="searchwrap">
+            <div class="search" id="searchbox">
+              <svg class="s-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="M15.8 15.8L21 21"/></svg>
+              <input id="q" type="search" placeholder="ค้นหาเทมเพลต เช่น อนุมัติตามวงเงิน" autocomplete="off"
+                     data-en-ph="Search templates, e.g. approval by amount" data-en-al="Search starting points"
+                     aria-label="ค้นหาจุดเริ่ม" aria-describedby="hits">
+              <button class="clear" id="qclear" type="button" aria-label="ล้างคำค้นหา" data-en-al="Clear search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 6.4l11.2 11.2M17.6 6.4L6.4 17.6"/></svg></button>
+            </div>
+            <div class="hits" id="hits" role="status" aria-live="polite"></div>
+          </div>
+          <!-- ‼️ ตัวเลขทุกตัวต้องตรงของจริง tests/browser_flowtrust.py นับของจริงมาเทียบ -->
+          <div class="facts">
+            <div class="fact"><b>5</b><span data-en="diagram types">ชนิดผัง</span></div>
+            <div class="fact"><b>0</b><span data-en="words sent out">ข้อความที่ถูกส่งออก</span></div>
+            <div class="fact"><b data-en="$0">฿0</b><span data-en="free, no ads">ฟรี ไม่มีโฆษณา</span></div>
+          </div>
+        </div>
+        <!-- ผังไอโซเมตริก วาดด้วย CSS ล้วน ภาษาภาพเดียวกับปึกกระดาษของ FileKit (ผิวเงิน ความมืดไล่สามชั้น เงาสัมผัสพื้น)
+             แคปซูลเริ่ม กล่อง ข้าวหลามตัดลอย แคปซูลจบ ต่อด้วยเส้น เป็นของตกแต่ง ไม่ต้องอ่าน -->
+        <div class="flow-obj" aria-hidden="true"><div class="board">
+          <div class="shadow"></div>
+          <div class="ln ln-1"></div><div class="ln ln-2"></div><div class="ln ln-3"></div>
+          <div class="nd n-start"><i></i><i></i><i></i></div>
+          <div class="nd n-box"><i></i><i></i><i><u></u></i></div>
+          <div class="nd n-ask"><i></i><i></i><i></i></div>
+          <div class="nd n-end"><i></i><i></i><i></i></div>
+        </div></div>
+      </div>
+      <div class="hero-grain" aria-hidden="true"></div>
+    </div>
+
+    <nav class="cats" id="cats" aria-label="กรองตามชนิดผัง" data-en-al="Filter by diagram type"></nav>
+    <div class="stage" id="stage">
+      <div class="stage-h" id="stageh"></div>
+      <div id="tools" tabindex="-1"></div>
+      <!-- ประตูไป FileKit บนมือถือ แถบโลโก้ท้ายเว็บซ่อนบนจอแคบ ทางเดียวที่เหลือคือตรงนี้ (กลับด้านกับประตู FlowKit บนหน้าแรก FileKit)
+           ‼️ เลข 64 ต้องตรงกับจำนวนเครื่องมือใน FileKit src/registry.js (tests/browser_flowtrust.py เทียบ) -->
+      <a class="door" href="/filekit/"><b><span>File</span>Kit</b><span data-en="64 file tools that run on your device">เครื่องมือจัดการไฟล์ 64 ตัว ในเครื่องคุณ</span><i aria-hidden="true">→</i></a>
+      <div class="stage-f" data-en="No sign-up&nbsp;&nbsp; No ads&nbsp;&nbsp; Free, unlimited">ไม่ต้องสมัคร&nbsp;&nbsp; ไม่มีโฆษณา&nbsp;&nbsp; ใช้ฟรีไม่จำกัด</div>
+    </div>
+
+    <!-- ตรวจเองได้: ทุกคำอ้างมีเทสรองรับ (วินัยเดียวกับหน้าแรก FileKit) ไม่มีการ์ดปิดเน็ตแล้วใช้ได้ เพราะ FlowKit ต้องต่อเน็ต
+         และยังไม่อ้างเวลาเปิดหน้าจนกว่าจะวัดซ้ำได้ (tests/browser_flowperf.py บันทึกตัวเลขไว้ก่อน) -->
+    <section class="trust" aria-labelledby="trust-h">
+      <p class="trust-eye" data-en="Check it yourself">ตรวจเองได้ ไม่ต้องเชื่อคำโฆษณา</p>
+      <h2 class="trust-h" id="trust-h" data-en="Your text never leaves your device, and you can prove it">ข้อความไม่ออกจากเครื่องคุณ และคุณพิสูจน์เองได้</h2>
+      <div class="trust-grid">
+        <div class="trust-card">
+          <b data-en="Your text is never sent out">ข้อความไม่เคยถูกส่งออก</b>
+          <span data-en="The diagram engine runs in this browser. Our tests check every request that leaves the page and never find your text.">ตัววาดผังทำงานในเบราว์เซอร์นี้ เทสตรวจทุกคำขอที่ออกจากหน้าแล้วไม่เจอข้อความของคุณสักครั้ง</span>
+        </div>
+        <div class="trust-card">
+          <b data-en="One file for slides, still editable">ไฟล์เดียววางสไลด์ได้ เปิดแก้ได้</b>
+          <span data-en="You get a .drawio.png that drops into PowerPoint and opens again in draw.io for more editing.">ได้ไฟล์ .drawio.png วางใน PowerPoint ได้เลย ลากกลับมาแก้ต่อใน draw.io ได้ทุกเมื่อ</span>
+        </div>
+        <div class="trust-card">
+          <b data-en="Power Automate flows do not leak">flow ของ Power Automate ไม่รั่ว</b>
+          <span data-en="Connections, URLs and email addresses are stripped the moment you paste, so they never reach the image.">วางแล้ว connection , URL , อีเมล ถูกตัดทิ้งตั้งแต่ตอนวาง ไม่ติดไปในไฟล์ภาพ</span>
+        </div>
+        <div class="trust-card">
+          <b data-en="The code is open to inspect">โค้ดเปิดให้ตรวจ</b>
+          <span data-en="Read every line on GitHub. 15 FlowKit test suites must pass before anything ships.">อ่านโค้ดทั้งหมดได้บน GitHub มีชุดทดสอบของ FlowKit 15 ชุดที่ต้องผ่านครบก่อนปล่อยของ</span>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<footer><a href="https://github.com/PatcharasitP/flowkit" target="_blank" rel="noopener" data-en="Source code on GitHub">โค้ดทั้งหมดเปิดดูได้บน GitHub</a></footer>
+<!-- แถบเดียวกับหน้าแรก FileKit แต่ FlowKit เป็นตัวที่หนาอยู่ ‼️ รายการต้องตรงกับ FileKit (tests/accepts.test.mjs เทียบ) -->
+<nav class="network" aria-label="เว็บและหมวดในเครือ FileKit" data-en-al="FileKit family of sites and tool groups">
+  <ul class="sites">
+    <li><a href="/filekit/" data-gocat="" aria-label="FileKit"><span>File</span><b>Kit</b></a></li>
+    <li><a href="/filekit/#/freebies"><b data-en="Freebies">ของแจกฟรี</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="excel"><b data-en="Excel">Excel</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="powerbi" aria-label="Power BI"><span>Power</span><b>BI</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="powerquery" aria-label="Power Query"><span>Power</span><b>Query</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="powerautomate" aria-label="Power Automate"><span>Power</span><b>Automate</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="thai"><b data-en="Thai docs">งานไทย</b></a></li>
+    <li><a class="self" href="./" aria-label="FlowKit"><span>Flow</span><b>Kit</b></a></li>
+    <li><a href="https://patcharasitp.github.io/portfolio/" target="_blank" rel="noopener" aria-label="Portfolio"><span>Port</span><b>folio</b></a></li>
+    <li><a href="https://patcharasitp.github.io/portfolio/dashboard/" target="_blank" rel="noopener" aria-label="BKK Dashboard"><span>BKK</span><b>Dashboard</b></a></li>
+  </ul>
+</nav>
+
+<!-- แปลข้อความในหน้าให้เสร็จก่อนวาดจอ (ตัวอักษรเดียวกับหน้าแรก FileKit) -->
+<script>try{if(localStorage.getItem("fk-lang")==="en"){var d=document,r=d.documentElement;r.lang="en";
+d.querySelectorAll("[data-en]").forEach(function(n){n.textContent=n.dataset.en});
+d.querySelectorAll("[data-en-html]").forEach(function(n){n.innerHTML=n.dataset.enHtml});
+d.querySelectorAll("[data-en-ph]").forEach(function(n){n.setAttribute("placeholder",n.dataset.enPh)});
+d.querySelectorAll("[data-en-al]").forEach(function(n){n.setAttribute("aria-label",n.dataset.enAl);
+  if(n.hasAttribute("title"))n.setAttribute("title",n.dataset.enAl)});}}catch(e){}</script>
+<script type="module" src="src/home.js"></script>
 </body>
 </html>

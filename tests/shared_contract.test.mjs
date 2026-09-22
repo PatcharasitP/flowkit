@@ -58,20 +58,28 @@ function webFiles() {
 const strip = (name, s) => name.endsWith(".html") ? s.replace(/<!--[\s\S]*?-->/g, "")
   : s.replace(/\/\*[\s\S]*?\*\//g, "").replace(name.endsWith(".css") ? /$^/ : /(^|[^:"'\w])\/\/.*$/gm, "$1");
 
-/** ที่อยู่ /filekit/ ที่ผิดที่ และ FileKit/ ตัวใหญ่ ในไฟล์เว็บ */
-function sweep(files) {
+/** ที่อยู่ /filekit/ ที่ผิดที่ และ FileKit/ ตัวใหญ่ ในไฟล์เว็บ
+ *  ‼️ modulepreload ของไฟล์ที่ shared.js ใช้อยู่แล้วยอมได้ (โหลดล่วงหน้าไม่ได้เพิ่มการพึ่ง FileKit ใหม่ เพิ่ม 22/09/2026) ไฟล์อื่นแดง */
+function sweep(files, allowed = sharedPaths()) {
   const bad = [];
   for (const [name, raw] of files) {
     const s = strip(name, raw);
     s.split("\n").forEach((ln, i) => {
       if (/FileKit\//.test(ln)) bad.push(`${name}:${i + 1} มี FileKit/ ตัวใหญ่ ${ln.trim().slice(0, 60)}`);
       if (!ln.includes("/filekit/") || name === "src/shared.js") return;
-      const font = /\/filekit\/vendor\/fonts\/Sarabun-(Regular|SemiBold|Bold)\.woff2/.test(ln) && /@font-face|rel="preload"/.test(ln);
+      /* ฟอนต์ 3 ไฟล์ (ชื่อเต็ม หรือสคริปต์ preload ที่ต่อชื่อตอนรัน "Sarabun-"+w+".woff2" แบบหน้าแรก FileKit) */
+      const font = /\/filekit\/vendor\/fonts\/Sarabun-(?:(Regular|SemiBold|Bold)\.woff2|"\+\w+\+"\.woff2)/.test(ln) && /@font-face|rel="preload"/.test(ln);
       const link = name.endsWith(".html") && /^\s*(<li>)?<a [^>]*href="\/filekit\/[^"]*"/.test(ln);
-      if (!font && !link) bad.push(`${name}:${i + 1} ${ln.trim().slice(0, 70)}`);
+      const pre = (ln.match(/<link rel="modulepreload" href="\/filekit\/([^"]+)">/) || [])[1];
+      if (!font && !link && !(pre && allowed.includes(pre))) bad.push(`${name}:${i + 1} ${ln.trim().slice(0, 70)}`);
     });
   }
   return bad;
+}
+
+function sharedPaths() {
+  const code = strip("shared.js", readFileSync(join(ROOT, "src/shared.js"), "utf8"));
+  return [...new Set([...code.matchAll(/"\/filekit\/([^"]*)"/g)].map((m) => m[1]))];
 }
 
 async function main() {
@@ -127,9 +135,12 @@ function selftest() {
   } finally { rmSync(tmp, { recursive: true, force: true }); }
   const fake = [["src/fake.js", 'import { x } from "/filekit/src/x.js";'], ["draw/fake.css", 'a{background:url("/filekit/assets/x.png")}'],
                 ["fake.html", '<script src="/FileKit/src/i18n.js"></script>'], ["ok.css", '@font-face{src:url("/filekit/vendor/fonts/Sarabun-Bold.woff2")}'],
-                ["ok.html", '    <li><a href="/filekit/#/">x</a></li>'], ["ok2.js", '// เล่าที่มา /filekit/src/i18n.js ในคอมเมนต์ได้']];
+                ["ok.html", '    <li><a href="/filekit/#/">x</a></li>'], ["ok2.js", '// เล่าที่มา /filekit/src/i18n.js ในคอมเมนต์ได้'],
+                ["ok3.html", '<link rel="modulepreload" href="/filekit/src/i18n.js">'], ["pre.html", '<link rel="modulepreload" href="/filekit/src/registry.js">'],
+                ["ok4.html", '<script>l.rel="preload";l.href="/filekit/vendor/fonts/Sarabun-"+w+".woff2"</script>'], ["img.html", '<script>l.rel="preload";l.href="/filekit/assets/"+w+".png"</script>']];
   const bad = sweep(fake).map((b) => b.split(":")[0]);
-  ck(bad.includes("src/fake.js") && bad.includes("draw/fake.css") && bad.includes("fake.html"), "ตัวกวาดจับ import ตรง , รูปใน CSS , FileKit/ ตัวใหญ่", bad.join(" , "));
+  ck(bad.includes("src/fake.js") && bad.includes("draw/fake.css") && bad.includes("fake.html") && bad.includes("pre.html") && bad.includes("img.html"),
+     "ตัวกวาดจับ import ตรง , รูปใน CSS , FileKit/ ตัวใหญ่ , โหลดล่วงหน้าไฟล์ที่ shared.js ไม่ได้ใช้", bad.join(" , "));
   ck(!bad.some((n) => n.startsWith("ok")), "ตัวกวาดปล่อยฟอนต์ ลิงก์แถบเว็บ และคอมเมนต์", bad.join(" , "));
 }
 
