@@ -149,5 +149,29 @@ search.addEventListener("keydown", (e) => {
   sync();
 }
 
+/* ── ลูกเล่น: เอียงวัตถุในฉากเปิดตามเมาส์ (แบบเดียวกับปึกกระดาษของ FileKit src/app.js) ──
+ * ‼️ เฉพาะเครื่องที่มีเมาส์จริง จอสัมผัสยิง pointermove ตอนเลื่อนหน้าแล้วกระตุก , เครื่องที่ตั้งลดการเคลื่อนไหวไม่เอียง
+ * ‼️ ตั้งค่าผ่าน CSSOM (setProperty) ไม่ใช่ setAttribute("style") CSP ของหน้านี้ไม่มี unsafe-inline */
+{
+  const obj = document.querySelector(".hero3d");
+  const fine = matchMedia("(hover:hover) and (pointer:fine)").matches;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (obj && fine && !still) {
+    const hero = obj.closest(".hero");
+    let raf = 0, ev = null;
+    const set = (x, y) => { obj.style.setProperty("--tx", x + "deg"); obj.style.setProperty("--ty", y + "deg"); };
+    hero.addEventListener("pointermove", (e) => {
+      ev = e;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = hero.getBoundingClientRect();
+        set(((0.5 - (ev.clientY - r.top) / r.height) * 9).toFixed(2), (((ev.clientX - r.left) / r.width - 0.5) * 12).toFixed(2));
+      });
+    });
+    hero.addEventListener("pointerleave", () => set(0, 0));
+  }
+}
+
 renderCats();
 render();

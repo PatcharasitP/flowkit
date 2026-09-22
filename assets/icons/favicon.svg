@@ -1,18 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+<!-- ‼️ พื้นม่วงเต็มใบ มาร์กขาว (พี่ปอนด์ทัก 23/09/2026 ว่าไอคอนแท็บซ้ำกับ FileKit จนแยกไม่ออก)
+     FileKit = สี่เหลี่ยมจางตัว F สีน้ำเงิน , FlowKit = สี่เหลี่ยมม่วงกล่องสองกล่องสีขาว แยกออกทันทีที่ 16 พิกเซล
+     ‼️ เขียนที่ผืน 16 หน่วยโดยตรง (ไม่ย่อจากผืน 48) เส้นกับขอบกล่องจึงไม่คร่อมพิกเซลตอนย่อเป็นไอคอนแท็บ -->
 <style>
-.bg{fill:#eef0fb}
-.box{fill:#2f3ea3}
-.wire{fill:none;stroke:#6c4fd1;stroke-width:3.4;stroke-linecap:round}
-@media (prefers-color-scheme: dark){
-.bg{fill:#12142a}
-.box{fill:#eef1ff}
-.wire{stroke:#9d7bff}
-}
+.bg{fill:#6c4fd1}
+@media (prefers-color-scheme: dark){ .bg{fill:#7c5ce0} }
 </style>
-<rect class="bg" width="48" height="48" rx="9"/>
-<g transform="translate(0 2.5)">
-<rect class="box" x="7" y="7" width="15" height="12" rx="3.2"/>
-<path class="wire" d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5"/>
-<rect class="box" x="26" y="24" width="15" height="12" rx="3.2"/>
-</g>
+<rect class="bg" width="16" height="16" rx="3.4"/>
+<rect x="2.33" y="3.17" width="5" height="4" rx="1.07" fill="#ffffff"/>
+<path d="M4.83 7.17v2.5a1.17 1.17 0 0 0 1.17 1.17h2.5" fill="none" stroke="#ffffff" stroke-opacity=".92" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="8.67" y="8.83" width="5" height="4" rx="1.07" fill="#ffffff"/>
 </svg>

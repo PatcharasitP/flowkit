@@ -135,7 +135,8 @@ function thaiNoEn(html) {
 }
 /** CSP หน้าแรกไม่มี unsafe-inline จึงห้าม style ในแท็ก และห้าม JS ตั้ง style ทั้งก้อน */
 const styleAttrs = (html) => [...html.replace(/<!--[\s\S]*?-->/g, "").matchAll(/<[a-z][^>]*\sstyle="[^"]*"/g)].map((m) => m[0].slice(0, 50));
-const styleInJs = (js) => [...js.replace(/\/\/.*$/gm, "").matchAll(/setAttribute\(\s*["']style["']|\.style\.cssText|\bstyle:\s*[`"']/g)].map((m) => m[0]);
+/* ‼️ ตัดคอมเมนต์ทั้งสองแบบก่อน ไม่งั้นคอมเมนต์ที่เล่าว่า "ไม่ใช้ setAttribute('style')" โดนจับเอง (เจอจริง 23/09/2026) */
+const styleInJs = (js) => [...js.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'\w])\/\/.*$/gm, "$1").matchAll(/setAttribute\(\s*["']style["']|\.style\.cssText|\bstyle:\s*[`"']/g)].map((m) => m[0]);
 /** การ์ดหน้าแรกทุกใบชี้ของที่มีจริงในหน้าวาด */
 function catalogProblems(catalog, templates, kinds) {
   const out = [], ids = new Set(), tpl = new Set(templates.map((t) => t.id));
@@ -259,7 +260,8 @@ function selftest() {
   ck(navDiff(nav, nav.map((x) => x[0] === "Excel" ? [x[0], "/filekit/#/x"] : x)).length === 1, "ลิงก์ชี้ผิดที่ จับได้");
   ck(thaiNoEn('<body><p>ไทยไม่มีคำแปล</p><p data-en="x">ไทย</p><h1 data-en-html="a<em>b</em>">ก<em>ข</em></h1>').length === 1, "ข้อความไทยไม่มีคำแปล จับได้ (ลูกของ data-en-html ไม่นับ)");
   ck(Object.keys(vars("@media (x){\n:root{--a:1;}\n}", "@media (x){ :root{")).length === 1, "หาบล็อกสีเจอแม้จัดบรรทัดต่างกัน");
-  ck(styleAttrs('<div style="--ac:red">').length === 1 && styleInJs('el.setAttribute("style", x)').length === 1, "style ในแท็กและใน JS จับได้");
+  ck(styleAttrs('<div style="--ac:red">').length === 1 && styleInJs('el.setAttribute("style", x)').length === 1
+     && styleInJs('/* ห้าม setAttribute("style") */ el.style.setProperty("--tx", v)').length === 0, "style ในแท็กและใน JS จับได้ และไม่จับที่อยู่ในคอมเมนต์");
   ck(catalogProblems([{ id: "a", href: "draw/?tpl=nope", kind: "steps", th: "ก", en: "a" }, { id: "a", href: "x/", kind: "zz", th: "ก", en: "" }],
                      [{ id: "renewal" }], [{ id: "steps" }]).length >= 4, "การ์ดชี้เทมเพลตที่ไม่มี , id ซ้ำ , ไม่ชี้หน้าวาด , ชนิดไม่มี , ขาดคำแปล จับได้");
 }

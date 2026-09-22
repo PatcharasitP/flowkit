@@ -62,15 +62,18 @@ CONTRAST = """() => { const parse = (s) => (s.match(/[\\d.]+/g) || []).map(Numbe
            stageLum: lum(bgOf(document.querySelector('.stage'))) }; }"""
 
 
-HERO_ANIMS = """() => { const a = document.getAnimations().filter((x) => x.effect && x.effect.target && x.effect.target.closest && x.effect.target.closest('.hero-demo')
-    && x.animationName && x.animationName.startsWith('a-') && x.animationName !== 'a-march');
-  const t = a.map((x) => x.effect.getTiming());
-  return { n: a.length, durations: [...new Set(t.map((x) => x.duration))], delays: [...new Set(t.map((x) => x.delay))] }; }"""
-HERO_STILL = """() => { const q = (s) => [...document.querySelectorAll('.hero-demo ' + s)];
-  const shown = (e) => parseFloat(getComputedStyle(e).opacity) === 1;
-  const nodes = q('.node').filter(shown).length, lines = q('.wipe').filter((r) => { const m = getComputedStyle(r).transform; return m === 'none' || m === 'matrix(1, 0, 0, 1, 0, 0)'; }).length;
-  const edges = q('.edge').filter((e) => parseFloat(getComputedStyle(e).strokeDashoffset) === 0).length;
-  return { nodes, lines, edges, ok: nodes === 5 && lines === 5 && edges === 4 && document.getAnimations().filter((x) => x.effect?.target?.closest?.('.hero-demo')).length <= 1 }; }"""
+HERO_ANIMS = """() => { const o = document.querySelector('.hero3d');
+  const a = document.getAnimations().filter((x) => x.effect?.target?.closest?.('.hero3d') || x.effect?.target?.parentElement?.closest?.('.hero3d'));
+  const names = [...new Set(a.map((x) => x.animationName))].sort();
+  const durs = [...new Set(a.map((x) => x.effect.getTiming().duration))].sort((m, n) => m - n);
+  return { n: a.length, names, durs, spark: !!o.querySelector('.spark animateMotion'), tiles: o.querySelectorAll('.tile').length,
+           pipes: o.querySelectorAll('.pipe').length }; }"""
+HERO_STILL = """() => { const o = document.querySelector('.hero3d');
+  const running = document.getAnimations().filter((x) => x.effect?.target?.closest?.('.hero3d') || x.effect?.target?.parentElement?.closest?.('.hero3d')).length;
+  const tiles = [...o.querySelectorAll('.tile')].filter((e) => e.getBoundingClientRect().width > 20).length;
+  const sparkHidden = [...o.querySelectorAll('.spark')].every((e) => getComputedStyle(e).display === 'none');
+  return { running, tiles, sparkHidden, ok: running === 0 && tiles === 2 && sparkHidden }; }"""
+TILT = """() => { const o = document.querySelector('.hero3d'); return [o.style.getPropertyValue('--tx'), o.style.getPropertyValue('--ty'), getComputedStyle(o).transform]; }"""
 
 
 def focus_ring_missing(pg, n=30):
@@ -125,8 +128,8 @@ def selftest(b):
     ck("ไม่มีกรอบโฟกัส จับได้", n >= 3 and len(miss) == n, f"{len(miss)}/{n}")
     ctx.close()
     ctx = b.new_context(viewport={"width": 1440, "height": 900}, reduced_motion="reduce"); pg = ctx.new_page(); pg.goto(HOME); home_ready(pg)
-    pg.evaluate("() => { document.querySelector('.hero-demo .n3').style.opacity = '0'; }")
-    ck("ภาพนิ่งขาดกล่องหนึ่งใบ จับได้", not pg.evaluate(HERO_STILL)["ok"])
+    pg.evaluate("() => document.querySelector('.hero3d .t2').remove()")
+    ck("ภาพหัวเว็บขาดกล่องหนึ่งก้อน จับได้", not pg.evaluate(HERO_STILL)["ok"])
     ctx.close()
 
 
@@ -233,16 +236,30 @@ def main():
                c["card"] >= 4.5 and c["cat"] >= 4.5, json.dumps({k: round(v, 2) for k, v in c.items()}))
             ctx.close()
 
-        # ── ⑦.5 ภาพหัวเว็บ พิมพ์แล้วกลายเป็นผัง (พี่ปอนด์เลือก 22/09/2026) ──
+        # ── ⑦.5 ภาพหัวเว็บ โลโก้ 3 มิติ (พี่ปอนด์เคาะ 23/09/2026) ──
         print("\n━━ ⑦.5 ภาพหัวเว็บ ━━")
         ctx = b.new_context(viewport={"width": 1440, "height": 900}); pg = ctx.new_page(); pg.goto(HOME); home_ready(pg)
-        anim = pg.evaluate(HERO_ANIMS)
-        ck("ภาพหัวเว็บเคลื่อนไหว ทุกชิ้นวนเท่ากัน 7 วินาที ไม่มี delay (ฉากเดียวกันไม่หลุดจังหวะ)",
-           anim["n"] >= 15 and anim["durations"] == [7000] and anim["delays"] == [0], json.dumps(anim, ensure_ascii=False))
+        a = pg.evaluate(HERO_ANIMS)
+        ck("ภาพหัวเว็บครบ: กล่องเงิน 2 ก้อน ท่อ 3 ชั้น จุดแสงในท่อ", a["tiles"] == 2 and a["pipes"] == 3 and a["spark"], json.dumps(a, ensure_ascii=False))
+        ck("แสงกวาดผิวกับกล่องที่สองลอยขึ้น ทำงานอยู่", a["n"] >= 3 and a["names"] == ["c-lift", "h3-sweep"] and a["durs"] == [4800, 6000], json.dumps(a, ensure_ascii=False))
+        before = pg.evaluate(TILT)
+        pg.mouse.move(1150, 250)
+        # ‼️ รอจนค่าเอียงถูกตั้งจริง (ตั้งใน requestAnimationFrame ตอนเครื่องมีงานเยอะมาช้ากว่า 120 ms ได้ เคยแดงหลอก 23/09/2026)
+        try: pg.wait_for_function("() => document.querySelector('.hero3d').style.getPropertyValue('--tx') !== ''", timeout=5000)
+        except Exception: pass
+        pg.wait_for_timeout(350); mid = pg.evaluate(TILT)
+        pg.mouse.move(700, 700)                                                # ออกจากฉากเปิด
+        try: pg.wait_for_function("() => document.querySelector('.hero3d').style.getPropertyValue('--tx') === '0deg'", timeout=5000)
+        except Exception: pass
+        pg.wait_for_timeout(350); after = pg.evaluate(TILT)
+        ck("ลูกเล่นเอียงตามเมาส์ทำงาน และกลับที่เดิมเมื่อเมาส์ออก", before[0] == "" and mid[0] not in ("", "0deg") and mid[2] != before[2] and after[0] in ("0deg", ""),
+           f"{before[:2]} → {mid[:2]} → {after[:2]}")
         ctx.close()
         ctx = b.new_context(viewport={"width": 1440, "height": 900}, reduced_motion="reduce"); pg = ctx.new_page(); pg.goto(HOME); home_ready(pg)
         still = pg.evaluate(HERO_STILL)
-        ck("‼️ เครื่องที่ตั้งลดการเคลื่อนไหว เห็นผังนิ่งที่ครบ (กล่อง 5 บรรทัด 5 เส้น 4)", still["ok"], json.dumps(still, ensure_ascii=False))
+        ck("‼️ เครื่องที่ตั้งลดการเคลื่อนไหว ภาพหัวเว็บนิ่งสนิท ไม่มีจุดแสง แต่ยังเห็นกล่องครบ", still["ok"], json.dumps(still, ensure_ascii=False))
+        pg.mouse.move(1150, 250); pg.wait_for_timeout(200)
+        ck("ลดการเคลื่อนไหวแล้วไม่เอียงตามเมาส์", pg.evaluate(TILT)[0] == "")
         ctx.close()
 
         # ── ⑧ กดการ์ดทุกใบ หน้าวาดเปิดของนั้นจริง ──

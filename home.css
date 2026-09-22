@@ -194,6 +194,7 @@ main{max-width:var(--page-w); margin:0 auto; padding:clamp(18px,3.4vw,34px) var(
   text-transform:uppercase; color:var(--text-mute)}
 .fact b{font-size:15px; font-weight:700; line-height:1.5; color:var(--text);
   letter-spacing:calc(1em * -0.02)}
+@property --sw{syntax:"<percentage>"; inherits:false; initial-value:-32%}
 .hero-grain{position:absolute; inset:0; z-index:2; opacity:.4; pointer-events:none;
   mix-blend-mode:soft-light;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
@@ -376,67 +377,36 @@ a.pill,a.brand{text-decoration:none}
 [data-kind="pa"]{--ac:var(--g-data)}
 [data-kind="other"]{--ac:var(--text-dim)}
 
-/* ── ภาพหัวเว็บ พิมพ์แล้วกลายเป็นผัง (พี่ปอนด์เลือก 22/09/2026) ทุกชิ้นวนเท่ากันไม่มี delay ฉากจางตอนท้ายแล้วรีเซ็ตตอนมองไม่เห็น
-   ‼️ หัวลูกศรวาดแยก ไม่ใช้ marker (marker ขึ้นก่อนเส้นวาดถึง) , ค่าตั้งต้นทุกชิ้น = สภาพครบ (ลดการเคลื่อนไหวแล้วเห็นภาพนิ่งครบ) ── */
-.demo{display:block; width:100%; height:auto; max-width:520px; max-height:clamp(190px,22vw,290px); margin-inline:auto; overflow:visible}
-.hero-demo{position:relative; display:grid; place-items:center; min-height:clamp(190px,22vw,290px)}
-.hero-demo::before{content:""; position:absolute; width:78%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle, rgba(120,145,255,.22), rgba(120,145,255,0) 66%)}
-@media (max-width:860px){ .hero-demo{display:none} }
-.demo text{font-family:var(--font); fill:#e7ebff}
-.demo-a .card{fill:rgba(255,255,255,.035); stroke:rgba(255,255,255,.11); stroke-width:1}
-.demo-a .cap{font-size:11.5px; fill:rgba(210,218,255,.5)}
-.demo-a .rule{stroke:rgba(255,255,255,.07); stroke-width:1}
-.demo-a .ln{font-size:15px; fill:#dde3ff}
-.demo .tip{fill:rgba(176,190,255,.85)}
-.demo-a .bridge{fill:none; stroke:rgba(176,190,255,.45); stroke-width:1.4; stroke-dasharray:3 4}
-.demo .edge{fill:none; stroke:rgba(176,190,255,.62); stroke-width:1.4}
-.demo-a .edge{stroke-dasharray:1; stroke-dashoffset:0}
-.demo .node rect,.demo .node path{fill:rgba(138,163,255,.10); stroke:rgba(176,190,255,.78); stroke-width:1.3}
-.demo .node text{font-size:13px; text-anchor:middle; fill:#eef1ff}
-.demo .node text.sm{font-size:11.5px}
-.demo .lab{font-size:11px; text-anchor:middle; fill:rgba(210,218,255,.6)}
-.demo-a .wipe,.demo-a .node,.demo-a .lab{transform-box:fill-box; transform-origin:0 50%}
-.demo-a .node{transform-origin:50% 50%}
-.demo-a .scene{animation:a-scene 7.0s linear infinite}
-@keyframes a-scene{0%{opacity:0} 2.14%{opacity:1} 88.57%{opacity:1} 97.14%,100%{opacity:0}}
-.demo-a .bridge{animation:a-march 1.2s linear infinite}
-@keyframes a-march{to{stroke-dashoffset:-14}}
-.demo-a .w1{animation:a-w1 7.0s linear infinite}
-@keyframes a-w1{0%,3.57%{transform:scaleX(0)} 8.57%,100%{transform:scaleX(1)}}
-.demo-a .n1{animation:a-n1 7.0s cubic-bezier(.2,.8,.2,1) infinite}
-@keyframes a-n1{0%,7.86%{opacity:0; transform:scale(.9)} 12.14%,100%{opacity:1; transform:scale(1)}}
-.demo-a .w2{animation:a-w2 7.0s linear infinite}
-@keyframes a-w2{0%,15.00%{transform:scaleX(0)} 20.00%,100%{transform:scaleX(1)}}
-.demo-a .n2{animation:a-n2 7.0s cubic-bezier(.2,.8,.2,1) infinite}
-@keyframes a-n2{0%,21.43%{opacity:0; transform:scale(.9)} 25.71%,100%{opacity:1; transform:scale(1)}}
-.demo-a .e2{animation:a-e2 7.0s linear infinite}
-@keyframes a-e2{0%,18.57%{stroke-dashoffset:1} 21.43%,100%{stroke-dashoffset:0}}
-.demo-a .t2{animation:a-t2 7.0s linear infinite}
-@keyframes a-t2{0%,20.86%{opacity:0} 21.71%,100%{opacity:1}}
-.demo-a .w3{animation:a-w3 7.0s linear infinite}
-@keyframes a-w3{0%,27.86%{transform:scaleX(0)} 32.86%,100%{transform:scaleX(1)}}
-.demo-a .n3{animation:a-n3 7.0s cubic-bezier(.2,.8,.2,1) infinite}
-@keyframes a-n3{0%,33.57%{opacity:0; transform:scale(.9)} 37.86%,100%{opacity:1; transform:scale(1)}}
-.demo-a .e3{animation:a-e3 7.0s linear infinite}
-@keyframes a-e3{0%,31.43%{stroke-dashoffset:1} 33.57%,100%{stroke-dashoffset:0}}
-.demo-a .t3{animation:a-t3 7.0s linear infinite}
-@keyframes a-t3{0%,33.00%{opacity:0} 33.86%,100%{opacity:1}}
-.demo-a .w4{animation:a-w4 7.0s linear infinite}
-@keyframes a-w4{0%,40.71%{transform:scaleX(0)} 45.71%,100%{transform:scaleX(1)}}
-.demo-a .n4{animation:a-n4 7.0s cubic-bezier(.2,.8,.2,1) infinite}
-@keyframes a-n4{0%,49.29%{opacity:0; transform:scale(.9)} 53.57%,100%{opacity:1; transform:scale(1)}}
-.demo-a .e4{animation:a-e4 7.0s linear infinite}
-@keyframes a-e4{0%,44.29%{stroke-dashoffset:1} 49.29%,100%{stroke-dashoffset:0}}
-.demo-a .t4{animation:a-t4 7.0s linear infinite}
-@keyframes a-t4{0%,48.71%{opacity:0} 49.57%,100%{opacity:1}}
-.demo-a .w5{animation:a-w5 7.0s linear infinite}
-@keyframes a-w5{0%,55.00%{transform:scaleX(0)} 60.00%,100%{transform:scaleX(1)}}
-.demo-a .n5{animation:a-n5 7.0s cubic-bezier(.2,.8,.2,1) infinite}
-@keyframes a-n5{0%,63.57%{opacity:0; transform:scale(.9)} 67.86%,100%{opacity:1; transform:scale(1)}}
-.demo-a .e5{animation:a-e5 7.0s linear infinite}
-@keyframes a-e5{0%,58.57%{stroke-dashoffset:1} 63.57%,100%{stroke-dashoffset:0}}
-.demo-a .t5{animation:a-t5 7.0s linear infinite}
-@keyframes a-t5{0%,63.00%{opacity:0} 63.86%,100%{opacity:1}}
-@media (prefers-reduced-motion: reduce){ .demo-a *,.demo-a{animation:none!important} }
+/* ── ภาพหัวเว็บ: โลโก้ FlowKit 3 มิติ (พี่ปอนด์เคาะ 23/09/2026) วัสดุเดียวกับปึกกระดาษของ FileKit
+   ‼️ ห้าม filter หรือ opacity ที่ .hero3d (ฉาก 3 มิติจะถูกแบนทิ้ง) , ของที่ขยับทุกเฟรมเป็น transform เท่านั้น
+   จุดแสงในท่อเป็น SMIL ใน SVG (ไม่ใช่ JS) , ลดการเคลื่อนไหว = นิ่งและซ่อนจุดแสง ── */
+.hero3d{position:relative; height:clamp(190px,22vw,290px); display:grid; place-items:center; perspective:1200px; perspective-origin:52% 42%;
+  transform:rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg)); transition:transform 280ms var(--ease)}
+.hero3d::before{content:""; position:absolute; width:86%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle, rgba(150,170,255,.28), rgba(150,170,255,0) 66%)}
+.hero3d .plane{position:relative; width:clamp(170px,19vw,250px); aspect-ratio:1; transform-style:preserve-3d; transform:rotateX(56deg) rotateZ(-38deg)}
+.hero3d .lay{position:absolute; border-radius:inherit; background:linear-gradient(rgba(4,6,10,var(--dim,0)), rgba(4,6,10,var(--dim,0))),linear-gradient(147deg,#fff 0%,#e8edf7 24%,#b4bfd6 52%,#dbe1ee 68%,#fbfcff 100%); box-shadow:0 24px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.95); transform:translateZ(var(--z,0px))}
+.hero3d .face{box-shadow:0 26px 48px rgba(0,0,0,.55), inset 0 1.5px 0 rgba(255,255,255,1), inset 1.5px 0 0 rgba(255,255,255,.7), inset -1.5px -1.5px 0 rgba(150,170,255,.5); overflow:hidden}
+@property --sw{syntax:"<percentage>"; inherits:false; initial-value:-32%}
+.hero3d .face::after{content:""; position:absolute; inset:-45%; background:linear-gradient(112deg, transparent calc(var(--sw) - 13%), rgba(255,255,255,.9) var(--sw), transparent calc(var(--sw) + 13%)); animation:h3-sweep 6s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes h3-sweep{0%,64%{--sw:-32%} 100%{--sw:132%}}
+.hero3d .contact{position:absolute; width:clamp(170px,19vw,250px); aspect-ratio:1; border-radius:50%;
+  background:radial-gradient(closest-side, rgba(0,0,0,.62) 0%, rgba(0,0,0,.46) 26%, rgba(0,0,0,.26) 48%, rgba(0,0,0,.1) 66%, transparent 80%);
+  transform:rotateX(56deg) rotateZ(-38deg) translateZ(-26px) scale(1.12,.8)}
+.hero3d svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+@media (max-width:860px){ .hero3d{display:none} }
+@media (prefers-reduced-motion: reduce){ .hero3d *,.hero3d *::after{animation:none!important} .hero3d .spark{display:none} }
+.hero3d-c .tile{position:absolute; width:37.5%; height:30%; border-radius:12%/15%; transform-style:preserve-3d}
+.hero3d-c .t1{left:7.50%; top:7.50%}
+.hero3d-c .t2{left:55.00%; top:50.00%}
+.hero3d-c .lay{inset:0}
+.hero3d-c .plane{width:clamp(200px,23vw,300px)}
+.hero3d-c .l1{--z:0px; --dim:.54} .hero3d-c .l2{--z:5px; --dim:.44} .hero3d-c .l3{--z:10px; --dim:.33} .hero3d-c .l4{--z:15px; --dim:.2} .hero3d-c .face{--z:20px; --dim:0}
+.hero3d-c .wire{transform:translateZ(var(--z,10px))} .hero3d-c .w1{--z:4px} .hero3d-c .w2{--z:8px} .hero3d-c .w3{--z:12px}
+.hero3d-c .pipe{fill:none; stroke-width:4; stroke-linecap:round; stroke-linejoin:round} .hero3d-c .w1 .pipe{stroke:#4c5468} .hero3d-c .w2 .pipe{stroke:#7d879e} .hero3d-c .w3 .pipe{stroke:url(#wm)}
+.hero3d-c .spark{mix-blend-mode:normal}
+.hero3d-c .t2{animation:c-lift 4.8s cubic-bezier(.3,.7,.2,1) infinite}
+@keyframes c-lift{0%,35.0%{transform:translateZ(0)} 44.0%{transform:translateZ(16px)} 70.0%{transform:translateZ(16px)} 96%,100%{transform:translateZ(0)}}
+.hero3d-c .t2 .face::after{animation-delay:-3s}
+
 /* หน้า 404 ใช้ไฟล์นี้ร่วม */
 .notfound{max-width:var(--page-w); margin:0 auto; padding:clamp(40px,12vh,140px) var(--page-pad)}
