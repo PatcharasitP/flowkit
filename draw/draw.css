@@ -284,3 +284,16 @@ html.in-room body{overflow:hidden}
   .network{display:none}
 }
 @media (max-width:420px){ .types{gap:5px} .type{padding:0 12px; font-size:13.5px} }
+
+/* ‼️ แถบเว็บในเครือแบบ sqlbi (พี่ปอนด์ขอ 23/09/2026 จากหน้า sqlbi.com): FileKit กับ FlowKit มีไอคอนติดชื่อ , ทุกอันมีป้ายบอกตอนชี้
+   ป้ายทำด้วย CSS ล้วน (content:attr(data-tip)) สลับภาษาด้วย :root[lang="en"] ไม่ต้องแตะสคริปต์แปลภาษาที่ถูก hash ไว้ใน CSP
+   ระยะข้างลดจาก 20 เป็น 16 พิกเซล เพราะไอคอนทำให้แถบยาวขึ้น 42 พิกเซล แล้ว BKK Dashboard ตกบรรทัด (วัดจริงที่จอ 1280) */
+.sites a{position:relative; padding-inline:16px}
+.sites a .ico{width:17px; height:17px; flex:none; align-self:center; display:block}
+.sites a::after{content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 7px); transform:translateX(-50%);
+  background:#14161c; color:#eef1ff; border:1px solid rgba(255,255,255,.15); border-radius:7px; padding:5px 10px;
+  font-size:12.5px; font-weight:400; line-height:1.5; white-space:nowrap; letter-spacing:0; box-shadow:0 10px 24px -10px rgba(0,0,0,.7);
+  opacity:0; visibility:hidden; transition:opacity .12s ease}
+.sites a:hover::after,.sites a:focus-visible::after{opacity:1; visibility:visible}
+:root[lang="en"] .sites a::after{content:attr(data-tip-en)}
+@media (prefers-reduced-motion: reduce){ .sites a::after{transition:none} }

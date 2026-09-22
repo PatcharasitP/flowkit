@@ -71,7 +71,7 @@ function middotsInHtml(html) {
   const body = html.replace(/<!--[\s\S]*?-->/g, "").replace(/<script[\s\S]*?<\/script>/g, "").replace(/<style[\s\S]*?<\/style>/g, "");
   const out = [];
   for (const m of body.matchAll(/>([^<]*[·—][^<]*)</g)) out.push(m[1].trim().slice(0, 46));
-  for (const m of body.matchAll(/\b(?:data-en|data-en-al|data-en-ph|data-en-html|aria-label|title|placeholder|content)="([^"]*[·—][^"]*)"/g)) out.push(m[1].slice(0, 46));
+  for (const m of body.matchAll(/\b(?:data-en|data-en-al|data-en-ph|data-en-html|data-tip|data-tip-en|aria-label|title|placeholder|content)="([^"]*[·—][^"]*)"/g)) out.push(m[1].slice(0, 46));
   return out;
 }
 const cspOf = (html) => (html.match(/http-equiv="Content-Security-Policy"[^>]*content="([\s\S]*?)"/) || [])[1] || "";
@@ -112,14 +112,22 @@ function navOf(html, pageUrl) {
   return [...nav.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map((m) => {
     const href = (m[1].match(/href="([^"]*)"/) || [])[1] || "";
     const name = ((m[1].match(/aria-label="([^"]*)"/) || [])[1] || m[2].replace(/<[^>]+>/g, "")).trim();
-    return [name, new URL(href, pageUrl).href.replace("https://patcharasitp.github.io", "")];
+    const tip = (m[1].match(/data-tip="([^"]*)"/) || [])[1] || "", tipEn = (m[1].match(/data-tip-en="([^"]*)"/) || [])[1] || "";
+    return [name, new URL(href, pageUrl).href.replace("https://patcharasitp.github.io", ""), tip, tipEn];
   });
 }
 const SELF = new Set(["FileKit", "FlowKit"]);     // ตัวที่เป็นเว็บของตัวเองต่างกันได้ (ตัวหนา , ที่อยู่ของตัวเอง)
 function navDiff(a, b) {
   const out = [];
   if (a.map((x) => x[0]).join("|") !== b.map((x) => x[0]).join("|")) out.push(`รายชื่อไม่ตรง ${a.map((x) => x[0]).join(",")} กับ ${b.map((x) => x[0]).join(",")}`);
-  for (const [n, h] of a) { if (SELF.has(n)) continue; const o = b.find((x) => x[0] === n); if (o && o[1] !== h) out.push(`${n} ${h} กับ ${o[1]}`); }
+  for (const [n, h, tip, tipEn] of a) {
+    const o = b.find((x) => x[0] === n);
+    if (!o) continue;
+    if (!SELF.has(n) && o[1] !== h) out.push(`${n} ที่อยู่ ${h} กับ ${o[1]}`);
+    /* ‼️ ป้ายตอนชี้ (แบบ sqlbi 23/09/2026) ต้องมีสองภาษาครบ และตรงกันทั้งสองเว็บ */
+    if (!tip || !tipEn) out.push(`${n} ไม่มีป้ายครบสองภาษา (${tip} , ${tipEn})`);
+    if (o[2] !== tip || o[3] !== tipEn) out.push(`${n} ป้ายไม่ตรงกัน (${tip}|${tipEn} กับ ${o[2]}|${o[3]})`);
+  }
   return out;
 }
 /** ไทยในหน้า HTML ต้องมีคำแปล (data-en) หรือประกาศภาษา (lang) */
@@ -201,8 +209,9 @@ async function main() {
   /* ‼️ โลโก้หัวเว็บของ FlowKit เป็นม่วง ไม่ใช่สี่เหลี่ยมสีเดียวกับ FileKit (พี่ปอนด์ 23/09/2026) สองหน้าต้องสีเดียวกัน */
   const markBg = (f) => [...rd(f).matchAll(/\.brand \.mark\{[^}]*background:([^;}]+)/g)].map((m) => m[1].trim());
   const violet = (f) => markBg(f).filter((v) => v.startsWith("#")).join(",");
-  ck(violet("home.css") === "#6c4fd1,#7c5ce0,#7c5ce0" && violet("draw/draw.css") === "#6c4fd1,#7c5ce0,#7c5ce0",
-     `โลโก้หัวเว็บทั้งสองหน้าประกาศสีม่วงชุดเดียวกัน (${violet("home.css")} , ${violet("draw/draw.css")})`);
+  /* ‼️ home.css คัดมาจาก FileKit จึงมีกฎน้ำเงินของ FileKit ติดมาก่อน แล้วถูกกฎม่วงของ FlowKit ทับทีหลัง ดูค่าที่ชนะ (ชุดท้ายสุด) */
+  ck(violet("home.css").endsWith("#6c4fd1,#7c5ce0,#7c5ce0") && violet("draw/draw.css").endsWith("#6c4fd1,#7c5ce0,#7c5ce0"),
+     `โลโก้หัวเว็บทั้งสองหน้าจบด้วยสีม่วงชุดเดียวกัน (${violet("home.css")} , ${violet("draw/draw.css")})`);
 
   console.log("\n━━ ⑤ แถบเว็บในเครือ ตรงกับหน้าแรก FileKit ━━");
   const fknav = navOf(fkhtml, "https://patcharasitp.github.io/filekit/");
@@ -262,7 +271,9 @@ function selftest() {
   ck(colorDiff(fkcss, rd("home.css").replace(/--g-ppt:[^;]+;/, ""), true).out.some((x) => x.includes("ขาด --g-ppt")), "ตัวแปรสีหายหนึ่งตัว จับได้");
   const nav = navOf(idx, "https://patcharasitp.github.io/flowkit/");
   ck(navDiff(nav, nav.filter((x) => x[0] !== "Excel")).length >= 1, "ลิงก์ในแถบเว็บในเครือหายหนึ่งตัว จับได้");
-  ck(navDiff(nav, nav.map((x) => x[0] === "Excel" ? [x[0], "/filekit/#/x"] : x)).length === 1, "ลิงก์ชี้ผิดที่ จับได้");
+  ck(navDiff(nav, nav.map((x) => x[0] === "Excel" ? [x[0], "/filekit/#/x", x[2], x[3]] : x)).length === 1, "ลิงก์ชี้ผิดที่ จับได้");
+  ck(navDiff(nav, nav.map((x) => x[0] === "Excel" ? [x[0], x[1], "ป้ายอื่น", x[3]] : x)).length === 1, "ป้ายตอนชี้ไม่ตรงกันสองเว็บ จับได้");
+  ck(navDiff(nav.map((x) => x[0] === "Excel" ? [x[0], x[1], "", ""] : x), nav).length >= 1, "ป้ายตอนชี้หายไป จับได้");
   ck(thaiNoEn('<body><p>ไทยไม่มีคำแปล</p><p data-en="x">ไทย</p><h1 data-en-html="a<em>b</em>">ก<em>ข</em></h1>').length === 1, "ข้อความไทยไม่มีคำแปล จับได้ (ลูกของ data-en-html ไม่นับ)");
   ck(Object.keys(vars("@media (x){\n:root{--a:1;}\n}", "@media (x){ :root{")).length === 1, "หาบล็อกสีเจอแม้จัดบรรทัดต่างกัน");
   ck(styleAttrs('<div style="--ac:red">').length === 1 && styleInJs('el.setAttribute("style", x)').length === 1

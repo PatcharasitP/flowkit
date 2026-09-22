@@ -22,7 +22,7 @@
 <meta name="description" content="พิมพ์ขั้นตอนทีละบรรทัด ได้ผังงาน ผังองค์กร ผังระบบ หรือไทม์ไลน์ มีเทมเพลตงานบริษัทไทยให้เริ่ม ดาวน์โหลดเป็นภาพวางสไลด์ได้ทันที เปิดแก้ต่อใน draw.io ได้ ข้อความไม่ออกจากเครื่อง">
 <meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
-<meta name="flowkit-version" content="flowkit-v5">
+<meta name="flowkit-version" content="flowkit-v6">
 <!-- ‼️ preload ฟอนต์เฉพาะเน็ตเร็ว (ที่มาและตัวเลขที่วัด ดูคอมเมนต์เดียวกันในหน้าแรก FileKit 13/09 และ 19/09/2026)
      เน็ตช้า preload แย่งโหลดกับหน้าแล้วเห็นหน้าช้าลง , เน็ตเร็ว preload กันการ์ดตกบรรทัดตอนฟอนต์มาถึง
      ‼️ ต้องมี crossOrigin แม้ same-origin ไม่งั้นโหลดซ้ำ 2 รอบ (พิสูจน์ 22/09/2026 เฟส 0 R3) -->
@@ -141,16 +141,16 @@
 <!-- แถบเดียวกับหน้าแรก FileKit แต่ FlowKit เป็นตัวที่หนาอยู่ ‼️ รายการต้องตรงกับ FileKit (tests/accepts.test.mjs เทียบ) -->
 <nav class="network" aria-label="เว็บและหมวดในเครือ FileKit" data-en-al="FileKit family of sites and tool groups">
   <ul class="sites">
-    <li><a href="/filekit/" data-gocat="" aria-label="FileKit"><span>File</span><b>Kit</b></a></li>
-    <li><a href="/filekit/#/freebies"><b data-en="Freebies">ของแจกฟรี</b></a></li>
-    <li><a href="/filekit/#/" data-gocat="excel"><b data-en="Excel">Excel</b></a></li>
-    <li><a href="/filekit/#/" data-gocat="powerbi" aria-label="Power BI"><span>Power</span><b>BI</b></a></li>
-    <li><a href="/filekit/#/" data-gocat="powerquery" aria-label="Power Query"><span>Power</span><b>Query</b></a></li>
-    <li><a href="/filekit/#/" data-gocat="powerautomate" aria-label="Power Automate"><span>Power</span><b>Automate</b></a></li>
-    <li><a href="/filekit/#/" data-gocat="thai"><b data-en="Thai docs">งานไทย</b></a></li>
-    <li><a class="self" href="./" aria-label="FlowKit"><span>Flow</span><b>Kit</b></a></li>
-    <li><a href="https://patcharasitp.github.io/portfolio/" target="_blank" rel="noopener" aria-label="Portfolio"><span>Port</span><b>folio</b></a></li>
-    <li><a href="https://patcharasitp.github.io/portfolio/dashboard/" target="_blank" rel="noopener" aria-label="BKK Dashboard"><span>BKK</span><b>Dashboard</b></a></li>
+    <li><a href="/filekit/" data-gocat="" aria-label="FileKit" data-tip="เครื่องมือจัดการไฟล์ 64 ตัว" data-tip-en="64 file tools"><svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M12,4 L31,4 L36,9 L36,14 L22,14 L22,20 L31,20 L31,30 L22,30 L22,44 L12,44 Z"/></svg><span>File</span><b>Kit</b></a></li>
+    <li><a href="/filekit/#/freebies" data-tip="ไฟล์แจกฟรี ใช้ได้เลย" data-tip-en="Free files to use"><b data-en="Freebies">ของแจกฟรี</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="excel" data-tip="เครื่องมือสาย Excel" data-tip-en="Excel tools"><b data-en="Excel">Excel</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="powerbi" aria-label="Power BI" data-tip="เครื่องมือสาย Power BI" data-tip-en="Power BI tools"><span>Power</span><b>BI</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="powerquery" aria-label="Power Query" data-tip="เครื่องมือสาย Power Query" data-tip-en="Power Query tools"><span>Power</span><b>Query</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="powerautomate" aria-label="Power Automate" data-tip="เครื่องมือสาย Power Automate" data-tip-en="Power Automate tools"><span>Power</span><b>Automate</b></a></li>
+    <li><a href="/filekit/#/" data-gocat="thai" data-tip="เครื่องมือเอกสารไทย" data-tip-en="Thai document tools"><b data-en="Thai docs">งานไทย</b></a></li>
+    <li><a class="self" href="./" aria-label="FlowKit" data-tip="วาดผังจากข้อความ" data-tip-en="Diagrams from text"><svg class="ico" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="12" rx="3.2" fill="currentColor"/><path d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><rect x="26" y="24" width="15" height="12" rx="3.2" fill="currentColor"/></svg><span>Flow</span><b>Kit</b></a></li>
+    <li><a href="https://patcharasitp.github.io/portfolio/" target="_blank" rel="noopener" aria-label="Portfolio" data-tip="ผลงานและโปรเจกต์" data-tip-en="Work and projects"><span>Port</span><b>folio</b></a></li>
+    <li><a href="https://patcharasitp.github.io/portfolio/dashboard/" target="_blank" rel="noopener" aria-label="BKK Dashboard" data-tip="แดชบอร์ดข้อมูลกรุงเทพ" data-tip-en="Bangkok data dashboard"><span>BKK</span><b>Dashboard</b></a></li>
   </ul>
 </nav>
 
