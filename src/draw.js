@@ -13,6 +13,7 @@ import { parseText } from "./parse.js";
 import { parsePA, prunePA, viewOptions, applyView } from "./parse-pa.js";
 import { toMermaid, STRETCH, edgeElbow } from "./to-mermaid.js";
 import { createEngine } from "./engine.js";
+import { applyDefaults, DEFAULTS } from "./defaults.js";
 import { createEditor } from "./editor.js";
 import { SAMPLES } from "./samples.js";
 import { TEMPLATES } from "./templates.js";
@@ -25,7 +26,7 @@ const editBtn = $("#edit"), room = $("#room"), fileIn = $("#filein"), dlSvg = $(
 const sendBtns = [...document.querySelectorAll("[data-send]")];
 /** ปุ่มที่ใช้ได้เมื่อมีผังพร้อม (ดาวน์โหลด , แบบอื่น , ส่งต่อ) เปิดปิดพร้อมกันเสมอ */
 const setReady = (on) => { for (const b of [dl, dlSvg, dlXml, ...sendBtns]) b.disabled = !on; };
-const KINDS = ["steps", "org", "system", "timeline", "pa"];        // pa = flow ของ Power Automate (ช่องพิมพ์รับ JSON)
+const KINDS = ["steps", "lane", "org", "system", "timeline", "pa"];        // pa = flow ของ Power Automate (ช่องพิมพ์รับ JSON)
 const SAMPLE = SAMPLES[IS_EN ? "en" : "th"];
 const DEBOUNCE_MS = 400;                          // แผนเฟส 2 ข้อ 5
 const isPhone = () => matchMedia("(max-width:760px)").matches;
@@ -69,6 +70,9 @@ function announce(t) { srstat.textContent = ""; setTimeout(() => { srstat.textCo
 const HINTS = {
   steps: tr("หนึ่งบรรทัดคือหนึ่งกล่อง , ลงท้ายด้วย ? คือจุดตัดสินใจ , ย่อหน้าใต้คำถามแล้วเขียน คำตอบ: ขั้นถัดไป",
             "One line is one box, end with ? for a decision, indent the answers under it as answer: next step"),
+  /* แผน v3 เฟส 4.3 ข้อ ③ คำแนะนำตอนเลือกชนิดลู่ */
+  lane: tr("เขียน [ฝ่าย] หน้าขั้นที่เปลี่ยนคนทำ ขั้นถัดไปเป็นของฝ่ายเดิมเอง , ที่เหลือเขียนเหมือนผังขั้นตอน",
+           "Write [team] before the step where the owner changes, the next steps stay with that team, the rest works like a process diagram"),
   org: tr("หนึ่งบรรทัดคือหนึ่งคนหรือหนึ่งทีม , ย่อหน้าเข้าไปคือคนที่ขึ้นกับบรรทัดข้างบน",
           "One line is one person or team, indent a line to put it under the line above"),
   system: tr("หนึ่งบรรทัดคือหนึ่งเส้น เขียนว่า ต้นทาง -> ปลายทาง: สิ่งที่ส่ง , ใช้ --> เป็นเส้นประ , <-> เป็นสองทาง",
@@ -81,7 +85,7 @@ const HINTS = {
 };
 const DRAFT_KEY = "fk-flow";
 let kind = "steps";
-const texts = { steps: null, org: null, system: null, timeline: null, pa: null };   // null = ยังเป็นตัวอย่าง
+const texts = { steps: null, lane: null, org: null, system: null, timeline: null, pa: null };   // null = ยังเป็นตัวอย่าง
 try {
   const d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
   if (d && KINDS.includes(d.kind)) kind = d.kind;
@@ -300,7 +304,7 @@ function fileName(model) {
   const safe = raw.replace(/[\\/:*?"<>|#%\u0000-\u001f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60).trim();
   return (safe || "FlowKit") + ".drawio.png";
 }
-const KIND_NAME = { steps: tr("ผังขั้นตอน", "Process diagram"), org: tr("ผังองค์กร", "Org chart"),
+const KIND_NAME = { steps: tr("ผังขั้นตอน", "Process diagram"), lane: tr("ผังใครทำอะไร", "Who does what diagram"), org: tr("ผังองค์กร", "Org chart"),
   system: tr("ผังระบบ", "Systems diagram"), timeline: tr("ไทม์ไลน์", "Timeline"), pa: tr("ผัง Power Automate", "Power Automate flow") };
 
 /** เอาภาพผัง (PNG ฝัง XML) ขึ้นจอ และเป็นไฟล์ที่ปุ่มดาวน์โหลดจะให้ */
@@ -488,12 +492,37 @@ function fillView(m) {
 }
 paSel.addEventListener("change", () => { view = paSel.value; announceNext = true; update(); });
 
+/* หน้าตาผัง (แผน v3 เฟส 1 , D2) สวิตช์ค่าตั้งต้นใน defaults.js จำไว้ใน localStorage แบบเดียวกับธีม (ไม่ใช่ข้อความของผู้ใช้)
+   เก็บเฉพาะข้อที่ต่างจากค่าเริ่มต้น เปลี่ยนค่าเริ่มต้นใน DEFAULTS แล้วคนที่ไม่เคยกดได้ค่าใหม่ทันที */
+const LOOK_KEY = "fk-look";
+const look = Object.fromEntries(DEFAULTS.map((d) => [d.key, d.on]));
+try { Object.assign(look, JSON.parse(localStorage.getItem(LOOK_KEY) || "{}")); } catch { /* โหมดส่วนตัว หรือค่าเสีย */ }
 let lastMmd = "", current = null, ver = 0, timer = 0;
+/* ตัวคำนวณผังลู่ โหลดครั้งแรกที่ต้องใช้ , วัดความกว้างข้อความด้วยฟอนต์ Sarabun ตัวเดียวกับที่ draw.io วาด (PROVEN 23/09 ข้อ 5)
+   ‼️ รอฟอนต์โหลดเสร็จก่อนวัด ไม่งั้นได้ความกว้างของฟอนต์สำรอง กล่องล้นหรือโบ๋ */
+let gridMod = null, grid$ = null;
+const measureCtx = document.createElement("canvas").getContext("2d");
+/* ‼️ วัดด้วย "FK Sarabun" (ไฟล์ของ FileKit) แต่ draw.io วาดด้วย Sarabun ของ Google ซึ่งกว้างกว่า 0 ถึง 4px ต่อข้อความ (ไม่เกิน 3%)
+   วัดจริง 23/09/2026 .claude/evidence/flowkit-v3-2026-09-23/phase2/fontcheck.py จึงเผื่อ 3% กล่องไม่แคบกว่าข้อความ */
+const measureText = (t, px) => { measureCtx.font = `${px}px "FK Sarabun"`; return measureCtx.measureText(t).width * 1.03; };
+function loadGrid() {
+  grid$ ||= Promise.all([import("./grid.js"), document.fonts.load('14px "FK Sarabun"'), document.fonts.load('13px "FK Sarabun"')])
+    .then(([m]) => { gridMod = m; });
+  return grid$;
+}
 function update() {
   clearTimeout(timer);
   const r = kind === "pa" ? parsePA(ta.value) : parseText(ta.value, kind);
   fillView(kind === "pa" ? r.model : null);
   if (r.model && kind === "pa") r.model = applyView(r.model, view);
+  /* ผังลู่ (แผน v3 เฟส 2): โหลด grid.js ตอนเลือกชนิดนี้ครั้งแรกเท่านั้น (งบความเร็ว D5 เหมือน parse-pa.js)
+     คำนวณตำแหน่งก่อนแสดงข้อความเตือน เพราะคำเตือนของลู่ (ลู่ว่าง , กว้างเกินสไลด์) มาจากตัวคำนวณ */
+  let grid = null;
+  if (r.model && r.model.kind === "lane") {
+    if (!gridMod) { loadGrid().then(update, () => {}); return; }
+    grid = gridMod.toGridXml(r.model, { measure: measureText, look: "h" });
+    r.model.warnings.push(...grid.warnings);
+  }
   paintHighlight(r.error ? r.error.line : 0);
   showMessages(r);
   if (edited) { paintEditNote(); return; }        // ผังที่แก้ด้วยมือ ข้อความไม่วาดทับเอง (ผู้ใช้เลือกผ่านป้าย)
@@ -514,7 +543,8 @@ function update() {
     return;
   }
   const model = r.model;
-  const mmd = toMermaid(model);
+  /* ลู่ที่ไม่มีฝ่ายเลย: วาดเป็นผังขั้นตอนธรรมดา (คำเตือนบอกวิธีใส่ฝ่ายแล้ว) */
+  const mmd = grid && grid.xml ? grid.xml : toMermaid(grid ? { ...model, kind: "steps" } : model);
   if (mmd === lastMmd && current) {
     current.name = fileName(model);               // ชื่อ: เปลี่ยนอย่างเดียว ผังไม่ต้องวาดใหม่
     setCanvas("ready"); setReady(true);
@@ -524,7 +554,9 @@ function update() {
   live.dataset.busy = "";
   /* ‼️ ห้ามทับข้อความต่อไม่ได้ด้วย "กำลังวาด" (เคยทับจนผู้ใช้ออฟไลน์ไม่รู้ว่าทำไมผังไม่ขึ้น จับได้ใน tests/browser_swpages.py) */
   if (!current && !engineDown() && canvas.dataset.state !== "booting") setCanvas("booting", [tr("กำลังวาดผัง", "Drawing")]);
-  engine.render(mmd, model.nodes.length, STRETCH[model.kind] || {}, edgeElbow(model)).then((out) => {
+  const job = grid && grid.xml ? engine.renderXml(applyDefaults(grid.xml, model, look))
+    : engine.render(mmd, model.nodes.length, STRETCH[model.kind] || {}, edgeElbow(model), (x) => applyDefaults(x, grid ? { ...model, kind: "steps" } : model, look));
+  job.then((out) => {
     if (out.stale || my !== ver) return;
     lastMmd = mmd;
     const alt = tr(`${KIND_NAME[model.kind]} ${model.nodes.length} กล่อง`, `${KIND_NAME[model.kind]} with ${model.nodes.length} boxes`);
@@ -605,6 +637,20 @@ for (const d of document.querySelectorAll(".dlg")) {
       : tr("ข้อความในช่องพิมพ์จะถูกแทนที่ กด Ctrl+Z ในช่องพิมพ์เพื่อย้อนกลับได้", "The text in the box is replaced, press Ctrl+Z in the box to bring it back");
     dlg.showModal();
   });
+}
+{
+  const dlg = $("#dlg-look");
+  for (const box of dlg.querySelectorAll("[data-look]")) {
+    box.checked = look[box.dataset.look] !== false;
+    box.addEventListener("change", () => {
+      look[box.dataset.look] = box.checked;
+      const diff = Object.fromEntries(DEFAULTS.filter((d) => look[d.key] !== d.on).map((d) => [d.key, look[d.key]]));
+      try { Object.keys(diff).length ? localStorage.setItem(LOOK_KEY, JSON.stringify(diff)) : localStorage.removeItem(LOOK_KEY); } catch { /* โหมดส่วนตัว */ }
+      lastMmd = "";                                 // ข้อความเดิมก็ต้องวาดใหม่ หน้าตาเปลี่ยน
+      update();
+    });
+  }
+  $("#openlook").addEventListener("click", () => dlg.showModal());
 }
 {
   const dlg = $("#dlg-ai"), desc = $("#ai-desc"), pre = $("#ai-prompt"), done = $("#ai-done");

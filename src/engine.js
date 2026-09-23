@@ -309,7 +309,11 @@ export function createEngine({ onState = () => {} } = {}) {
     const got = countVertices(first.xml);
     if (job.expectBoxes && got < job.expectBoxes) throw new EngineError("incomplete", `${got}/${job.expectBoxes}`);
     const stretch = job.stretch || {};
-    const xml = elbowEdges(stretchXY(edgesBelowGroups(fixNestedEdges(restyleGroups(restyleFont(first.xml)))), stretch.x, stretch.y), job.elbow);
+    const base = elbowEdges(stretchXY(edgesBelowGroups(fixNestedEdges(restyleGroups(restyleFont(first.xml)))), stretch.x, stretch.y), job.elbow);
+    /* ค่าตั้งต้นให้ผังอ่านง่าย (defaults.js แผน v3 เฟส 1) ต่อท้ายท่อ ผู้เรียกส่งมาเป็นฟังก์ชัน xml → xml ตัวนี้ไม่ต้องรู้จักโมเดล
+       ‼️ พังเมื่อไรใช้ xml ก่อนขั้นนี้ ผังต้องขึ้นเสมอ */
+    let xml = base;
+    if (job.post) { try { xml = job.post(base) || base; } catch { xml = base; } }
     await call({ action: "load", autosave: 0, xml }, "load");
     const out = await call(PNG_OUT, "export");
     return { png: pngBlob(out.data), xml: out.xml || xml };
@@ -339,8 +343,9 @@ export function createEngine({ onState = () => {} } = {}) {
   }
 
   return {
-    /** elbow: "v" | "h" = เส้นหักฉากแบบผังองค์กร (edgeElbow ใน to-mermaid.js) , null = เส้นโค้งของ Mermaid */
-    render(mermaid, expectBoxes = 0, stretch = {}, elbow = null) { return enqueue({ mermaid, expectBoxes, stretch, elbow }, true); },
+    /** elbow: "v" | "h" = เส้นหักฉากแบบผังองค์กร (edgeElbow ใน to-mermaid.js) , null = เส้นโค้งของ Mermaid
+     *  post: xml → xml ขั้นสุดท้ายก่อนวาด (ค่าตั้งต้นใน defaults.js) */
+    render(mermaid, expectBoxes = 0, stretch = {}, elbow = null, post = null) { return enqueue({ mermaid, expectBoxes, stretch, elbow, post }, true); },
     /** วาด xml ของ draw.io ที่มีอยู่แล้วเป็น PNG (ผังที่แก้ด้วยมือ กู้คืนหลังโหลดหน้าใหม่) */
     renderXml(xml) { return enqueue({ xml }, true); },
     /** จัดวางกล่องใหม่ทั้งผัง (ผังที่แก้ด้วยมือจนเละ) คืน PNG กับ xml ใหม่ */

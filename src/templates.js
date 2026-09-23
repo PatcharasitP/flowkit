@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// เทมเพลต 8 ใบ (แผนเฟส 5 ทางเข้า ③) เก็บเป็น "ข้อความตาม SPEC" ไม่ใช่ภาพ
+// เทมเพลต 10 ใบ (แผนเฟส 5 ทางเข้า ③ , ผังลู่ 2 ใบจากแผน v3 เฟส 2) เก็บเป็น "ข้อความตาม SPEC" ไม่ใช่ภาพ
 // ผู้ใช้เห็นวิธีเขียนไปในตัว แก้ต่อได้ทันที · 6 ใบแรกมาจากผังตัวอย่างที่ยิง draw.io พิสูจน์แล้ว (tests/flow_golden)
 // ‼️ repo นี้เป็นสาธารณะ เนื้อหาต้องเป็นกระบวนการทั่วไป ไม่มีชื่อบริษัท ระบบ หรือคน
 // ‼️ ทุกใบต้องอ่านผ่านโดยไม่มี error และไม่มีคำเตือน ทั้งสองภาษา (tests/flow_parse.test.mjs จับ)
@@ -37,6 +37,29 @@ export const TEMPLATES = [
       en: L("[Requester] Fill in the request", "[Manager] Check the need", "Needed?", "  No: [Requester] Gets a rejection", "    stop",
         "  Yes: [Purchasing] Ask 3 vendors for quotes", "[Purchasing] Compare prices", "[Manager] Approve the vendor", "[Purchasing] Issue the order",
         "[Requester] Receive and check the goods"),
+    },
+  },
+  /* ผังลู่ 2 ใบ (แผน v3 เฟส 2.3) 4 ฝ่ายต่อใบ มีทั้งกิ่งที่เปลี่ยนฝ่ายกลางทางและเส้นวนกลับ */
+  {
+    id: "lane-approval", kind: "lane",
+    title: { th: "ขออนุมัติข้ามฝ่าย", en: "Approval across teams" },
+    text: {
+      th: L("[พนักงาน] ยื่นใบขอซื้อ", "[หัวหน้างาน] ตรวจใบขอซื้อ", "วงเงินเกิน 10,000 ไหม?", "  ไม่เกิน: อนุมัติ",
+        "  เกิน: [ผู้จัดการฝ่าย] อนุมัติวงเงินสูง", "[จัดซื้อ] ออกใบสั่งซื้อ", "[การเงิน] จ่ายเงินผู้ขาย", "[พนักงาน] รับของ"),
+      en: L("[Employee] Submit a purchase request", "[Team lead] Check the request", "Over 10,000?", "  No: Approve",
+        "  Yes: [Department manager] Approve the larger amount", "[Purchasing] Issue the purchase order", "[Finance] Pay the vendor", "[Employee] Receive the goods"),
+    },
+  },
+  {
+    id: "lane-complaint", kind: "lane",
+    title: { th: "ร้องเรียนส่งต่อหลายฝ่าย", en: "Complaint across teams" },
+    text: {
+      th: L("[ลูกค้า] แจ้งปัญหา", "[Call Center] บันทึกเรื่อง", "แก้ทางโทรศัพท์ได้ไหม?", "  ได้: แจ้งวิธีแก้แล้วปิดเรื่อง", "    จบ",
+        "  ไม่ได้: [ช่างเทคนิค] ตรวจหน้างาน", "แก้เสร็จไหม?", "  เสร็จ: [Call Center] แจ้งลูกค้าว่าแก้แล้ว",
+        "  ไม่เสร็จ: [หัวหน้าช่าง] นัดวันเข้าซ่อมใหม่", "    กลับไป: ตรวจหน้างาน", "[ลูกค้า] ประเมินความพอใจ"),
+      en: L("[Customer] Reports a problem", "[Call center] Logs the case", "Can we fix it by phone?", "  Yes: Explain the fix and close", "    stop",
+        "  No: [Technician] Check on site", "Fixed?", "  Yes: [Call center] Tell the customer it is fixed",
+        "  No: [Lead technician] Book a new visit", "    back to: Check on site", "[Customer] Rates the service"),
     },
   },
   {

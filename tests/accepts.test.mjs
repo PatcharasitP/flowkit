@@ -152,7 +152,7 @@ function catalogProblems(catalog, templates, kinds) {
     if (ids.has(c.id)) out.push(`id ซ้ำ ${c.id}`); ids.add(c.id);
     const q = new URLSearchParams(c.href.split("?")[1] || "");
     if (!c.href.startsWith("draw/?")) out.push(`${c.id} ไม่ได้ชี้หน้าวาด ${c.href}`);
-    else if (q.has("kind") && !["steps", "org", "system", "timeline", "pa"].includes(q.get("kind"))) out.push(`${c.id} ชนิด ${q.get("kind")} ไม่มี`);
+    else if (q.has("kind") && !["steps", "lane", "org", "system", "timeline", "pa"].includes(q.get("kind"))) out.push(`${c.id} ชนิด ${q.get("kind")} ไม่มี`);
     else if (q.has("tpl") && !tpl.has(q.get("tpl"))) out.push(`${c.id} เทมเพลต ${q.get("tpl")} ไม่มีใน templates.js`);
     else if (q.has("open") && !["ai", "file"].includes(q.get("open"))) out.push(`${c.id} open=${q.get("open")} ไม่รู้จัก`);
     if (!kinds.some((k) => k.id === c.kind)) out.push(`${c.id} ชนิด ${c.kind} ไม่มีปุ่มหมวด`);
@@ -233,9 +233,9 @@ async function main() {
   const { CATALOG, KINDS } = await import(pathToFileURL(join(ROOT, "src/catalog.js")).href);
   const { TEMPLATES } = await import(pathToFileURL(join(ROOT, "src/templates.js")).href);
   const cp = catalogProblems(CATALOG, TEMPLATES, KINDS);
-  ck(CATALOG.length === 5 + TEMPLATES.length + 2 && !cp.length, `การ์ด ${CATALOG.length} ใบ ชี้ของที่มีจริงทุกใบ`, cp.join("\n      "));
+  ck(CATALOG.length === 6 + TEMPLATES.length + 2 && !cp.length, `การ์ด ${CATALOG.length} ใบ ชี้ของที่มีจริงทุกใบ`, cp.join("\n      "));
   const count = Object.fromEntries(KINDS.map((k) => [k.id, CATALOG.filter((c) => c.kind === k.id).length]));
-  ck(JSON.stringify(count) === JSON.stringify({ steps: 6, org: 2, system: 2, timeline: 2, pa: 1, other: 2 }), `จำนวนต่อหมวดตามแผน ${JSON.stringify(count)}`);
+  ck(JSON.stringify(count) === JSON.stringify({ steps: 6, lane: 3, org: 2, system: 2, timeline: 2, pa: 1, other: 2 }), `จำนวนต่อหมวดตามแผน ${JSON.stringify(count)}`);
   const ver = (h) => (h.match(/<meta name="flowkit-version" content="([^"]+)">/) || [])[1];
   ck(!!ver(html["index.html"]) && ver(html["index.html"]) === ver(html["draw/index.html"]), `meta รุ่นตรงกันสองหน้า (${ver(html["index.html"])})`);
   const sm = [...rd("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);

@@ -1,4 +1,4 @@
-# FlowKit ทางเข้าอื่น (แผนเฟส 5): เทมเพลต 8 ใบ กับปุ่มให้ AI ช่วยร่าง ผ่านหน้าเว็บจริง
+# FlowKit ทางเข้าอื่น (แผนเฟส 5): เทมเพลตทุกใบใน templates.js กับปุ่มให้ AI ช่วยร่าง ผ่านหน้าเว็บจริง
 #
 # ‼️ เทมเพลตทุกใบต้องกดแล้วได้ผังที่วาดเสร็จจริง ชนิดผังสลับให้ถูก และกล่องครบตามข้อความ
 # ‼️ ปุ่มคัดลอกคำสั่งต้องได้ข้อความในคลิปบอร์ดจริง (มีกติกา ตัวอย่าง และงานที่ผู้ใช้เล่า) ไม่ใช่แค่ขึ้นว่าคัดลอกแล้ว
@@ -56,14 +56,15 @@ def main():
 
         print("\n━━ เทมเพลต ━━")
         cards = pg.evaluate("() => { document.querySelector('#opentpl').click(); return [...document.querySelectorAll('#tpl-list .tpl')].length }")
-        ck("หน้าต่างเทมเพลตมี 8 ใบ", cards == 8, str(cards))
         pg.keyboard.press("Escape")
         tpls = pg.evaluate("""async () => { const { TEMPLATES } = await import('../src/templates.js'); return TEMPLATES.map((t) => [t.id, t.kind, t.title.th, t.text.th]); }""")
+        ck(f"หน้าต่างเทมเพลตมีครบทุกใบใน templates.js ({len(tpls)} ใบ)", cards == len(tpls) == 10, str(cards))
         for tid, kind, title, text in tpls:
             pg.click("#opentpl")
             pg.click(f"#tpl-list .tpl:has-text('{title}')")
             want = model_boxes(pg, text, kind)
             got = drawn(pg, want, 45000)
+            if kind == "lane": got = [t for t in got if t]      # ผังลู่: กรอบลู่เป็นกล่องไม่มีข้อความ ชื่อฝ่ายอยู่ที่หัวลู่ (นับรวมใน want แล้ว)
             pressed = pg.evaluate("() => document.querySelector('#types [aria-pressed=true]').dataset.kind")
             ck(f"[{tid}] กดแล้วได้ผัง{kind} กล่องครบ {len(want)} กล่อง ปุ่มชนิดผังสลับให้ถูก", got == sorted(want) and pressed == kind,
                f"ชนิด {pressed} ได้ {got}")
@@ -97,6 +98,7 @@ def main():
             pg.evaluate("""(x) => { const ta = document.querySelector('#src'); ta.focus(); ta.select(); document.execCommand('insertText', false, x); }""", text)
             want = model_boxes(pg, text, kind)
             got = drawn(pg, want, 45000)
+            if kind == "lane": got = [t for t in got if t]      # ผังลู่: กรอบลู่เป็นกล่องไม่มีข้อความ ชื่อฝ่ายอยู่ที่หัวลู่ (นับรวมใน want แล้ว)
             ck(f"คำตอบจริงของ AI {f.stem} วางแล้วได้ผัง {len(want)} กล่องครบ", bool(want) and got == sorted(want), str(got))
         ck("ไม่มี error บนหน้า", not errs, str(errs[:3]))
         b.close()

@@ -1,0 +1,138 @@
+<mxfile host="embed.diagrams.net">
+  <diagram id="QIRKeg6_t8MWLL_iGvaq" name="Page-1">
+    <mxGraphModel dx="5520" dy="720" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="เริ่ม (มีวงเล็บ) [เหลี่ยม] {ปีกกา}" mermaidId="n:n1" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="เริ่ม (มีวงเล็บ) [เหลี่ยม] {ปีกกา}" id="2">
+          <mxCell parent="1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="224" x="348" y="8" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="ข้อความมี &quot;คำพูด&quot; กับ &#39;ฟันหนู&#39;" mermaidId="n:n2" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="ข้อความมี &quot;คำพูด&quot; กับ &#39;ฟันหนู&#39;" id="3">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="258" x="331" y="97" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;มีท่อ&lt;/b&gt;&#xa;มากกว่า &gt; น้อยกว่า &lt; และ &amp; แฮช # เปอร์เซ็นต์ 50%" mermaidId="n:n3" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="&lt;b&gt;มีท่อ&lt;/b&gt;&#xa;มากกว่า &gt; น้อยกว่า &lt; และ &amp; แฮช # เปอร์เซ็นต์ 50%" id="4">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="73" width="402" x="259" y="201" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="end" mermaidId="n:n4" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="end" id="5">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="87" x="416" y="324" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="ข้อความยาวมากเพื่อดูว่ากล่องจะตัดบรรทัดยังไงเมื่อเจอประโยคภาษาไทยที่ยาวเกินแปดสิบตัวอักษรโดยไม่มีเว้นวรรคเลยสักที่เดียว" mermaidId="n:n5" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="ข้อความยาวมากเพื่อดูว่ากล่องจะตัดบรรทัดยังไงเมื่อเจอประโยคภาษาไทยที่ยาวเกินแปดสิบตัวอักษรโดยไม่มีเว้นวรรคเลยสักที่เดียว" id="6">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="903" x="8" y="428" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="เลขไทย ๑๒๓ เครื่องหมาย ✅ ลูกศรในข้อความ A -&gt; B" mermaidId="n:n6" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="เลขไทย ๑๒๓ เครื่องหมาย ✅ ลูกศรในข้อความ A -&gt; B" id="7">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="419" x="250" y="532" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="ราคา 1,500.50 บาท (รวม VAT 7%)?" mermaidId="n:n7" mermaidBaseStyle="html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;size=9.75;strokeWidth=1;whiteSpace=wrap;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="ราคา 1,500.50 บาท (รวม VAT 7%)?" id="8">
+          <mxCell parent="1" style="html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;size=9.75;strokeWidth=1;whiteSpace=wrap;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="277" x="321" y="636" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="ผ่าน; ไปต่อ" mermaidId="n:n8" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="ผ่าน; ไปต่อ" id="9">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="135" x="284" y="744" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="ย้อน\กลับ / ทางเลือก" mermaidId="n:n9" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="ย้อน\กลับ / ทางเลือก" id="10">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="199" x="469" y="744" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="graph TD" mermaidId="n:n10" mermaidBaseStyle="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" mermaidBaseValue="graph TD" id="11">
+          <mxCell parent="1" style="html=1;rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=1;fillColor=default;strokeColor=#8a8f98;fontColor=#14161c;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontSize=16;" vertex="1">
+            <mxGeometry height="39" width="90" x="415" y="848" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n1-&gt;n2#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="12">
+          <mxCell edge="1" parent="1" source="2" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="3">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n2-&gt;n3#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="13">
+          <mxCell edge="1" parent="1" source="3" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="4">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n3-&gt;n4#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.51;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="14">
+          <mxCell edge="1" parent="1" source="4" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.51;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="5">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n4-&gt;n5#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.51;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="15">
+          <mxCell edge="1" parent="1" source="5" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.51;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n5-&gt;n6#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="16">
+          <mxCell edge="1" parent="1" source="6" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="7">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n6-&gt;n7#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="17">
+          <mxCell edge="1" parent="1" source="7" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="ใช่ 100%" mermaidId="e:n7-&gt;n8#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontColor=light-dark(#333333,#cccccc);exitX=0.36;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="ใช่ 100%" id="18">
+          <mxCell edge="1" parent="1" source="8" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontColor=light-dark(#333333,#cccccc);exitX=0.36;exitY=1;entryX=0.5;entryY=0;" target="9">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="351" y="710" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="ไม่ใช่" mermaidId="e:n7-&gt;n9#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontColor=light-dark(#333333,#cccccc);exitX=0.64;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="ไม่ใช่" id="19">
+          <mxCell edge="1" parent="1" source="8" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;fontColor=light-dark(#333333,#cccccc);exitX=0.64;exitY=1;entryX=0.5;entryY=0;" target="10">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="568" y="710" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n8-&gt;n10#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0;entryY=0.03;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="20">
+          <mxCell edge="1" parent="1" source="9" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=0;entryY=0.03;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="11">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="351" y="823" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:n9-&gt;n10#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=1;entryY=0.03;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" mermaidBaseValue="" id="21">
+          <mxCell edge="1" parent="1" source="10" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=#8a8f98;strokeWidth=1;exitX=0.5;exitY=1;entryX=1;entryY=0.03;fontFamily=Sarabun;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DSarabun;" target="11">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="568" y="823" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

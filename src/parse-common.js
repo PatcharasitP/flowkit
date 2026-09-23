@@ -9,6 +9,7 @@ const KIND_WORDS = {
   "องค์กร": "org", "org": "org", "orgchart": "org",
   "ระบบ": "system", "system": "system", "systems": "system",
   "ไทม์ไลน์": "timeline", "timeline": "timeline",
+  "ลู่": "lane", "ใครทำอะไร": "lane", "lane": "lane", "lanes": "lane", "swimlane": "lane",
 };
 const DIR_WORDS = {
   "บนลงล่าง": "down", "down": "down", "td": "down", "tb": "down",
@@ -43,7 +44,7 @@ export function prepare(raw) {
         if (key === "ผัง" || key === "type") {
           const k = KIND_WORDS[val.toLowerCase()];
           if (!k) throw new FlowError(no, tr(`ไม่รู้จักชนิดผัง "${val}"`, `Unknown diagram type "${val}"`),
-            tr("ใช้ได้ 4 แบบ: ขั้นตอน, องค์กร, ระบบ, ไทม์ไลน์", "Use one of: steps, org, system, timeline"));
+            tr("ใช้ได้ 5 แบบ: ขั้นตอน, ลู่, องค์กร, ระบบ, ไทม์ไลน์", "Use one of: steps, lane, org, system, timeline"));
           head.kind = k;
         } else if (key === "ทิศ" || key === "dir" || key === "direction") {
           const d = DIR_WORDS[val.toLowerCase()];

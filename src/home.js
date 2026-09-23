@@ -1,4 +1,4 @@
-// หน้าแรก FlowKit: ปุ่มหมวด ค้นหา และการ์ดจุดเริ่ม 15 ใบ (แผนเว็บ FlowKit แยก ข้อ 4)
+// หน้าแรก FlowKit: ปุ่มหมวด ค้นหา และการ์ดจุดเริ่ม (นับจาก catalog.js) (แผนเว็บ FlowKit แยก ข้อ 4)
 // โครงหน้าตาลอกจากหน้าแรก FileKit (src/app.js ของ FileKit) ใช้คลาสชุดเดียวกัน .cat .pill .pill-group .empty
 // ‼️ ห้ามใส่ style ในแท็ก CSP ของหน้านี้ไม่มี unsafe-inline สีประจำหมวดใช้ data-kind แล้ว home.css แปลงเป็นสี
 //    (FileKit ใส่ style="--ac:..." ได้เพราะหน้าแรกของเขามี unsafe-inline)

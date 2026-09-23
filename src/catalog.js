@@ -6,6 +6,7 @@ import { TEMPLATES } from "./templates.js";
 /** ชนิดผังกับสีประจำ (ตัวแปรสีของ FileKit ใน home.css) ลำดับนี้คือลำดับปุ่มหมวด */
 export const KINDS = [
   { id: "steps", th: "ขั้นตอน", en: "Steps" },
+  { id: "lane", th: "ใครทำอะไร", en: "Who does what" },
   { id: "org", th: "องค์กร", en: "Org chart" },
   { id: "system", th: "ระบบ", en: "Systems" },
   { id: "timeline", th: "ไทม์ไลน์", en: "Timeline" },
@@ -31,6 +32,8 @@ const TPL_KEYS = {
   approval: "อนุมัติ วงเงิน เบิก ขอซื้อ approve approval budget",
   complaint: "ร้องเรียน ลูกค้า call center แจ้งปัญหา complaint customer ticket",
   purchasing: "จัดซื้อ ซื้อ ผู้รับผิดชอบ เลน swimlane purchase procurement role",
+  "lane-approval": "อนุมัติ ข้ามฝ่าย วงเงิน จัดซื้อ การเงิน ลู่ swimlane approval handoff",
+  "lane-complaint": "ร้องเรียน ลูกค้า ช่าง call center ลู่ swimlane complaint technician",
   renewal: "สัญญา เช่า ต่ออายุ lease contract renew",
   sla: "sla เวลา ซ่อม ภายใน deadline repair",
   team: "ทีม โครงสร้าง ผัง องค์กร หัวหน้า team structure",
@@ -40,6 +43,7 @@ const TPL_KEYS = {
 
 export const CATALOG = [
   blank("steps", "ผังขั้นตอน", "Process diagram", "flowchart process ขั้นตอน ผังงาน โฟลว์ ตัดสินใจ decision"),
+  blank("lane", "ผังใครทำอะไร", "Who does what", "swimlane ลู่ เลน ฝ่าย ผู้รับผิดชอบ ส่งต่อ ข้ามฝ่าย handoff role responsibility", "2026-09-23"),
   blank("org", "ผังองค์กร", "Org chart", "organization องค์กร ทีม หัวหน้า ลูกน้อง hierarchy"),
   blank("system", "ผังระบบ", "Systems diagram", "system ระบบ ข้อมูล ส่งต่อ data flow architecture"),
   blank("timeline", "ไทม์ไลน์", "Timeline", "timeline แผนงาน ช่วงเวลา ลำดับเวลา roadmap schedule"),
@@ -56,6 +60,7 @@ export const CATALOG = [
 
 /** ไอคอนเส้นบาง 7 แบบ (24x24 เส้นอย่างเดียว สีจาก currentColor ผ่าน .ico-svg ของ FileKit) */
 export const ICONS = {
+  lane: '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9.4h18M3 14.7h18M7.5 4v16"/><rect x="9.5" y="5.6" width="4.5" height="2.3" rx=".6"/><rect x="15" y="16.2" width="4.5" height="2.3" rx=".6"/><path d="M14 6.8h2.6v9.4"/>',
   steps: '<rect x="3" y="3" width="8" height="5" rx="1.5"/><path d="M7 8v3"/><path d="M7 11l4 3.5-4 3.5-4-3.5z"/><path d="M11 14.5h4"/><rect x="15" y="12" width="6" height="5" rx="1.5"/>',
   org: '<rect x="9" y="3" width="6" height="4.5" rx="1.2"/><path d="M12 7.5v3M6 10.5h12M6 10.5v3M18 10.5v3"/><rect x="3" y="13.5" width="6" height="4.5" rx="1.2"/><rect x="15" y="13.5" width="6" height="4.5" rx="1.2"/>',
   system: '<rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M10 7h4M6.5 10v2.5h3M17.5 10v2.5h-3"/>',

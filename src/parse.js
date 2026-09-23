@@ -9,7 +9,8 @@ import { parseOrg } from "./parse-org.js";
 import { parseSystem } from "./parse-system.js";
 import { parseTimeline } from "./parse-timeline.js";
 
-const PARSERS = { steps: parseSteps, org: parseOrg, system: parseSystem, timeline: parseTimeline };
+/* ผังลู่ (ใครทำอะไร , แผน v3 D3) ใช้ตัวอ่านผังขั้นตอนตัวเดียวกันทุกกติกา ต่างกันแค่ตัววาด (grid.js แทน Mermaid) */
+const PARSERS = { steps: parseSteps, lane: parseSteps, org: parseOrg, system: parseSystem, timeline: parseTimeline };
 /** ผังใหญ่เกินเท่านี้ใส่สไลด์เดียวอ่านยาก (D6 , หลุม H3) */
 export const BIG_DIAGRAM = 25;
 

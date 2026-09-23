@@ -108,7 +108,11 @@ export function parseSteps(lines, warnings = []) {
     }
     const open = [];
     let count = 0;
+    /* ‼️ ทุกกิ่งเริ่มจากฝ่ายของบรรทัดคำถาม ไม่ใช่ฝ่ายที่กิ่งพี่น้องก่อนหน้าเปลี่ยนไว้ (SPEC v3 3.1 "กิ่งสืบทอดฝ่ายจากบรรทัดคำถาม")
+       เดิมสืบทอดตามลำดับบรรทัด กิ่ง ครบ: ที่อยู่ใต้ ไม่ครบ: [ทีมงาน] ... เลยกลายเป็นงานของทีมงาน (tests/flow_grid เคส nested 23/09/2026) */
+    const askGroup = curGroup;
     for (let i = 0; i < kids.length;) {
+      curGroup = askGroup;
       const bl = kids[i];
       const sub = subtree(kids, i);
       i += 1 + sub.length;
@@ -149,7 +153,9 @@ export function parseSteps(lines, warnings = []) {
     if (!kids.length) throw new FlowError(line.no, tr("พร้อมกัน: ต้องมีงานข้างใต้อย่างน้อยสองบรรทัด", "parallel: needs at least two lines under it"),
       tr("ย่อหน้าแต่ละงานไว้ใต้ พร้อมกัน:", "Indent each task under parallel:"));
     const open = [];
+    const lineGroup = curGroup;                  // สายขนานทุกสายเริ่มจากฝ่ายก่อน พร้อมกัน: เหมือนกิ่งของคำถาม
     for (let i = 0; i < kids.length;) {
+      curGroup = lineGroup;
       const sub = subtree(kids, i);
       let t = step(kids[i].text, kids[i], [], tails, !tails.length);
       if (sub.length) t = seq(sub, t);

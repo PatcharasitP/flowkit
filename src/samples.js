@@ -38,6 +38,14 @@ export const SAMPLES = {
       "  ไม่ได้: ส่งช่างหน้างาน",
       "    ช่างปิดงาน",
     ].join("\n"),
+    lane: [
+      "[ลูกค้า] แจ้งซ่อม",
+      "[Call Center] รับเรื่อง",
+      "แก้ทางโทรศัพท์ได้ไหม?",
+      "  ได้: ปิดงาน",
+      "  ไม่ได้: [ช่าง] ออกไปซ่อมหน้างาน",
+      "    ช่างปิดงาน",
+    ].join("\n"),
     org: [
       "ผู้อำนวยการ",
       "  ผู้จัดการฝ่ายขาย",
@@ -69,6 +77,14 @@ export const SAMPLES = {
       "Can we fix it remotely?",
       "  Yes: Close the case",
       "  No: Send a technician",
+      "    Technician closes the case",
+    ].join("\n"),
+    lane: [
+      "[Customer] Reports a fault",
+      "[Call center] Logs it",
+      "Can we fix it by phone?",
+      "  Yes: Close the case",
+      "  No: [Technician] Repair on site",
       "    Technician closes the case",
     ].join("\n"),
     org: [

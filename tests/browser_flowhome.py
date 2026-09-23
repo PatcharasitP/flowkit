@@ -1,4 +1,4 @@
-# หน้าแรก FlowKit: การ์ด 15 ใบพาไปหน้าวาดที่ถูกต้องจริงไหม ค้นหา กรองหมวด การเข้าถึง มือถือ ธีมมืด (แผนเว็บ FlowKit แยก ข้อ 8.2)
+# หน้าแรก FlowKit: การ์ดทุกใบใน catalog.jsพาไปหน้าวาดที่ถูกต้องจริงไหม ค้นหา กรองหมวด การเข้าถึง มือถือ ธีมมืด (แผนเว็บ FlowKit แยก ข้อ 8.2)
 #
 # ‼️ ทุกข้อถามของที่ผู้ใช้ได้จริง: กดการ์ดแล้วหน้าวาดเปิดชนิดนั้น ใส่เทมเพลตนั้น ผังขึ้นจริง ไม่ใช่แค่ลิงก์มีอยู่
 # ‼️ R4 ของแผน: การ์ดเทมเพลตใช้ครั้งเดียว กด F5 แล้วร่างที่แก้ต้องไม่ถูกเทมเพลตทับ
@@ -149,19 +149,19 @@ def main():
         pg.goto(HOME); home_ready(pg); pg.wait_for_timeout(600)
         cat = pg.evaluate(CATALOG_JS); tpls = pg.evaluate(TEMPLATES_JS)
         ids = pg.evaluate("() => [...document.querySelectorAll('#tools a.pill')].map((e) => e.dataset.id)")
-        ck(f"การ์ดครบ {len(cat)} ใบ เรียงตาม catalog.js", len(cat) == 15 and ids == [c["id"] for c in cat], f"{len(ids)} {ids[:4]}")
+        ck(f"การ์ดครบ {len(cat)} ใบ เรียงตาม catalog.js", len(cat) == 18 and ids == [c["id"] for c in cat], f"{len(ids)} {ids[:4]}")
         hrefs = pg.evaluate("() => [...document.querySelectorAll('#tools a.pill')].map((e) => e.getAttribute('href'))")
         ck("การ์ดเป็นลิงก์ธรรมดาไปหน้าวาดพร้อมพารามิเตอร์", hrefs == [c["href"] for c in cat])
         ck("ไม่มี error และ CSP ไม่ปฏิเสธอะไร", not errs and not pg.evaluate("() => window.__csp || []"), f"{errs[:2]} {pg.evaluate('() => window.__csp || []')[:2]}")
         heads = pg.evaluate("() => [...document.querySelectorAll('#tools .pill-group')].map((e) => e.textContent.trim())")
         ck("สามกลุ่ม เริ่มจากหน้าว่าง เทมเพลต ทางเข้าอื่น", heads == ["เริ่มจากหน้าว่าง", "เทมเพลต", "ทางเข้าอื่น"], str(heads))
-        ck("ป้าย ใหม่ อยู่บนการ์ด Power Automate กับ AI", pg.evaluate("() => [...document.querySelectorAll('#tools a.pill .new')].map((e) => e.closest('a').dataset.id).join(',')") in ("pa,ai", ""),
+        ck("ป้าย ใหม่ อยู่บนการ์ดผังลู่ Power Automate กับ AI (ตามวันที่ since)", pg.evaluate("() => [...document.querySelectorAll('#tools a.pill .new')].map((e) => e.closest('a').dataset.id).join(',')") in ("lane,pa,ai", "lane", ""),
            pg.evaluate("() => [...document.querySelectorAll('#tools a.pill .new')].map((e) => e.closest('a').dataset.id).join(',')"))
 
         # ── ② กรองหมวด ตัวเลขตรงของจริง ──
         print("\n━━ ② กรองหมวด ━━")
         cats = pg.evaluate("() => [...document.querySelectorAll('#cats .cat')].map((e) => [e.dataset.kind, +e.querySelector('b').textContent])")
-        ck("ปุ่มหมวด 7 ปุ่ม ทั้งหมด = 15", len(cats) == 7 and cats[0] == ["all", 15], str(cats))
+        ck(f"ปุ่มหมวด 8 ปุ่ม ทั้งหมด = {len(cat)}", len(cats) == 8 and cats[0] == ["all", len(cat)], str(cats))
         bad = []
         for kind, n in cats[1:]:
             pg.click(f'#cats .cat[data-kind="{kind}"]')
@@ -170,7 +170,7 @@ def main():
             if len(shown) != n or any(k != kind for k in shown) or str(n) not in head or pressed != "true": bad.append(f"{kind} ปุ่มบอก {n} เห็น {len(shown)} หัว {head!r}")
         pg.click(f'#cats .cat[data-kind="{cats[-1][0]}"]')          # กดซ้ำ = ยกเลิกกรอง
         ck("ทุกหมวด ตัวเลขบนปุ่มตรงกับการ์ดที่เห็น และกดซ้ำแล้วกลับมาทั้งหมด",
-           not bad and pg.evaluate("() => document.querySelectorAll('#tools a.pill').length") == 15, " | ".join(bad))
+           not bad and pg.evaluate("() => document.querySelectorAll('#tools a.pill').length") == len(cat), " | ".join(bad))
 
         # ── ③ ค้นหา ──
         print("\n━━ ③ ค้นหา ━━")
@@ -185,7 +185,7 @@ def main():
         ck("ค้นไม่เจอ บอกตรง ๆ พร้อมปุ่มล้าง", pg.is_visible("#tools .empty") and pg.is_visible("#tools .empty .btn-soft"))
         pg.click("#tools .empty .btn-soft"); pg.wait_for_timeout(200)
         ck("กดล้างแล้วการ์ดกลับมาครบ ช่องค้นหาว่างและได้โฟกัส",
-           pg.evaluate("() => document.querySelectorAll('#tools a.pill').length") == 15 and pg.input_value("#q") == ""
+           pg.evaluate("() => document.querySelectorAll('#tools a.pill').length") == len(cat) and pg.input_value("#q") == ""
            and pg.evaluate("() => document.activeElement.id") == "q")
         pg.fill("#q", "องค์กร"); pg.wait_for_timeout(300)
         with pg.expect_navigation():

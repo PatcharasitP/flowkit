@@ -65,6 +65,8 @@
     <p class="sub" data-en="Type one line at a time, the layout is done for you">พิมพ์ทีละบรรทัด ผังจัดวางให้เอง</p>
     <div class="types" id="types" role="group" aria-label="ชนิดผัง" data-en-al="Diagram type">
       <button class="type" type="button" data-kind="steps" aria-pressed="true" data-en="Steps">ขั้นตอน</button>
+      <!-- ผังลู่ (แผน v3 เฟส 2) ข้อความแบบผังขั้นตอนทุกตัวอักษร แต่วาดเป็นลู่ตามฝ่าย src/grid.js -->
+      <button class="type" type="button" data-kind="lane" aria-pressed="false" data-en="Who does what">ใครทำอะไร</button>
       <button class="type" type="button" data-kind="org" aria-pressed="false" data-en="Org chart">องค์กร</button>
       <button class="type" type="button" data-kind="system" aria-pressed="false" data-en="Systems">ระบบ</button>
       <button class="type" type="button" data-kind="timeline" aria-pressed="false" data-en="Timeline">ไทม์ไลน์</button>
@@ -114,6 +116,7 @@
         <button class="linkbtn" type="button" data-send="images-to-pdf" disabled data-en="Make a PDF">รวมเป็น PDF</button> ,
         <button class="linkbtn" type="button" data-send="image-resize" disabled data-en="Shrink it">ย่อรูป</button> ,
         <button class="linkbtn" type="button" data-send="image-convert" disabled data-en="Change image type">แปลงชนิดรูป</button></span>
+      <span class="more-g"><button class="linkbtn" id="openlook" type="button" data-en="Diagram look">หน้าตาผัง</button></span>
     </p>
   </div>
 </main>
@@ -135,7 +138,7 @@
   </ul>
 </nav>
 
-<!-- เทมเพลต 8 ใบ (แผนเฟส 5) ‼️ ปุ่มปิดเป็นปุ่มธรรมดา ไม่ใช้ form method=dialog เพราะ CSP ตั้ง form-action 'none' -->
+<!-- เทมเพลต 10 ใบ (แผนเฟส 5 + v3 ผังลู่ 2 ใบ) ‼️ ปุ่มปิดเป็นปุ่มธรรมดา ไม่ใช้ form method=dialog เพราะ CSP ตั้ง form-action 'none' -->
 <dialog class="dlg" id="dlg-tpl" aria-labelledby="tpl-h">
   <button class="dlg-x" type="button" data-close aria-label="ปิด" data-en-al="Close">×</button>
   <h2 id="tpl-h" data-en="Start from a template">เริ่มจากเทมเพลต</h2>
@@ -155,6 +158,20 @@
   <button class="dlg-cta" id="ai-copy" type="button" data-en="Copy the prompt">คัดลอกคำสั่ง</button>
   <p class="dlg-note" id="ai-done" role="status"></p>
   <p class="dlg-note" data-en="Paste it into any AI chat you trust, then copy the answer back into the FlowKit box. FlowKit sends nothing to any AI itself. For confidential work, use made up names.">วางในแชท AI ตัวไหนก็ได้ที่ไว้ใจ แล้วคัดลอกคำตอบกลับมาวางในช่องพิมพ์ของ FlowKit ตัวเว็บไม่ได้ส่งอะไรให้ AI เอง ถ้าเป็นงานลับให้ใช้ชื่อสมมติ</p>
+</dialog>
+
+<!-- หน้าตาผัง (แผน v3 เฟส 1 , src/defaults.js) ทุกข้อเปิดอยู่ ปิดทีละข้อได้ จำค่าไว้ในเบราว์เซอร์นี้ -->
+<dialog class="dlg" id="dlg-look" aria-labelledby="look-h">
+  <button class="dlg-x" type="button" data-close aria-label="ปิด" data-en-al="Close">×</button>
+  <h2 id="look-h" data-en="Diagram look">หน้าตาผัง</h2>
+  <div class="look-list" id="look-list">
+    <label class="look"><input type="checkbox" data-look="jumps"> <span data-en="Lines hop over where they cross">เส้นที่ตัดกันกระโดดข้าม</span></label>
+    <label class="look"><input type="checkbox" data-look="floating"> <span data-en="Lines attach to the nearest side of a box">เส้นเกาะขอบกล่องด้านที่ใกล้สุด</span></label>
+    <label class="look"><input type="checkbox" data-look="uniform"> <span data-en="Boxes lined up together share one width">กล่องที่เรียงแนวเดียวกันกว้างเท่ากัน</span></label>
+    <label class="look"><input type="checkbox" data-look="semantic"> <span data-en="Start box green, end box red">กล่องเริ่มขอบเขียว กล่องจบขอบแดง</span></label>
+    <label class="look"><input type="checkbox" data-look="loops"> <span data-en="Lines that go back are dashed">เส้นที่วนกลับเป็นเส้นประ</span></label>
+  </div>
+  <p class="dlg-note" data-en="Applies to diagrams drawn from text, a diagram you edited by hand stays as it is">ใช้กับผังที่วาดจากข้อความ ผังที่แก้ด้วยมือแล้วจะไม่เปลี่ยน</p>
 </dialog>
 
 <!-- ห้องแก้ไข (แผนเฟส 3) draw.io ตัวเต็มจอ ปุ่มบันทึกกับออกเป็นของ draw.io เอง src/editor.js สร้าง iframe ตอนเปิดครั้งแรก -->

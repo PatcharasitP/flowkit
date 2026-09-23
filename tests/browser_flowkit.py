@@ -206,8 +206,11 @@ def main():
         want = STEPS_SAMPLE = ["ลูกค้าแจ้งเรื่อง", "Call Center รับเรื่อง", "แก้ได้เองไหม?", "ปิดงาน", "ส่งช่างหน้างาน", "ช่างปิดงาน"]
         ck("ในไฟล์มีกล่องครบ 6 กล่อง ข้อความไทยตรงทุกกล่อง", sorted(got) == sorted(want), f"ได้ {got}")
         ck("ฟอนต์ในไฟล์เป็น Sarabun ทุกกล่อง", fonts(xml) == ["Sarabun"], f"ได้ {fonts(xml)}")
-        ck("สีเป็นขาวเทาของเรา ไม่ใช่ม่วงตั้งต้นของ Mermaid (เส้นเทา #8a8f98 ทุกกล่อง)", css_check_colors(xml)
-           and all("strokeColor=#8a8f98" in st for _, st in cells(xml)), str(sorted(set(re.findall(r"strokeColor=([^;\"]*)", xml)))))
+        # ‼️ v3 เฟส 1 (defaults.js สีตามความหมาย): กล่องเริ่มขอบเขียว กล่องจบขอบแดง นอกนั้นเทาของเรา ห้ามม่วงของ Mermaid
+        START, END = "light-dark(#3f9a63,#6cc28c)", "light-dark(#c4574f,#e8877f)"
+        want_col = {"ลูกค้าแจ้งเรื่อง": START, "ปิดงาน": END, "ช่างปิดงาน": END}
+        ck("สีเป็นขาวเทาของเรา ไม่ใช่ม่วงตั้งต้นของ Mermaid (เส้นเทา #8a8f98 ทุกกล่อง ยกเว้นกล่องเริ่มเขียว กล่องจบแดง)", css_check_colors(xml)
+           and all(f"strokeColor={want_col.get(t, '#8a8f98')}" in st for t, st in cells(xml)), str(sorted(set(re.findall(r"strokeColor=([^;\"]*)", xml)))))
         shape = {t: s for t, s in cells(xml)}
         ck("คำถามเป็นข้าวหลามตัด จุดเริ่มกับจุดจบเป็นแคปซูล", "rhombus" in shape.get("แก้ได้เองไหม?", "")
            and "rounded=1" in shape.get("ลูกค้าแจ้งเรื่อง", "") and "rounded=1" in shape.get("ช่างปิดงาน", ""),

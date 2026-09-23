@@ -68,9 +68,15 @@ const RULES = {
   },
 };
 
+/* ผังลู่ใช้กติกาผังขั้นตอนทุกข้อ ต่างกันที่ข้อ [ฝ่าย] ซึ่งกลายเป็นหัวใจของผัง */
+for (const [lang, rule] of [["th", "ขั้นแรกของทุกฝ่ายต้องขึ้นต้นด้วย [ชื่อฝ่าย] เช่น [บัญชี] ตรวจเอกสาร ขั้นถัดไปที่ฝ่ายเดิมทำไม่ต้องเขียนซ้ำ ใช้ชื่อฝ่ายเดิมทุกครั้ง"],
+  ["en", "The first step of every team starts with [Team name], like [Finance] Check the papers. Later steps by the same team need no name. Spell each team the same way every time"]]) {
+  RULES[lang].lane = RULES[lang].steps.map((r) => (/\[/.test(r) ? rule : r));
+}
+
 const KIND_WORD = {
-  th: { steps: "ขั้นตอน", org: "องค์กร", system: "ระบบ", timeline: "ไทม์ไลน์" },
-  en: { steps: "process", org: "org chart", system: "systems", timeline: "timeline" },
+  th: { steps: "ขั้นตอน", lane: "ใครทำอะไร (แยกลู่ตามฝ่าย)", org: "องค์กร", system: "ระบบ", timeline: "ไทม์ไลน์" },
+  en: { steps: "process", lane: "swimlane (who does what)", org: "org chart", system: "systems", timeline: "timeline" },
 };
 
 /** ตัวอย่าง 2 ใบของชนิดผังนั้น (ตัวอย่างในช่องพิมพ์ + เทมเพลตชนิดเดียวกัน) */
