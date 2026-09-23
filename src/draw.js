@@ -6,7 +6,7 @@
 // ‼️ ข้อความของผู้ใช้เก็บใน sessionStorage เท่านั้น (สลับภาษา = โหลดหน้าใหม่ ต้องไม่หาย)
 //    ปิดแท็บแล้วหายตั้งใจ เครื่องที่ใช้ร่วมกันจะไม่มีผังของคนก่อนค้างอยู่
 // ─────────────────────────────────────────────────────────────────────────────
-import { tr, IS_EN, FILEKIT, loadHandoff, loadInApp } from "./shared.js";
+import { tr, pl, IS_EN, FILEKIT, loadHandoff, loadInApp } from "./shared.js";
 import { initChrome } from "./chrome.js";
 import { takeParams } from "./params.js";
 import { parseText } from "./parse.js";
@@ -83,6 +83,10 @@ const HINTS = {
   pa: tr("วาง flow ของ Power Automate ตรงนี้ ได้ทั้งก้อนที่คัดลอกจากกล่อง Scope ที่ครอบทั้ง flow และไฟล์ definition.json , ค่าที่ตั้งไว้ในแต่ละขั้นถูกตัดทิ้งตั้งแต่ตอนวาง ชื่อกล่องมาจาก description แก้ตรงนี้ได้เลย",
          "Paste a Power Automate flow here, a block copied from a container action (like a Scope around the whole flow) or a definition.json file. Action values are removed as you paste, box names come from the description, edit them right here"),
 };
+/* ช่องพิมพ์ว่าง (แผน v3 เฟส 4.3 ข้อ ①) บอกกติกาที่ผังทำให้เอง และไวยากรณ์ป้ายตอนชี้ */
+const EMPTY_HINT = tr("สี่เหลี่ยมคือขั้นที่ทำ , ลงท้ายด้วย ? คือจุดตัดสินใจ , กล่องแรกกับกล่องสุดท้ายเป็นแคปซูลให้เอง , ท้ายบรรทัดใส่ (( คำอธิบาย )) ได้ป้ายตอนชี้",
+  "A plain line is a step, end with ? for a decision, the first and last boxes become capsules by themselves, end a line with (( a note )) for a hover note");
+const hintFor = (k, empty) => (empty && (k === "steps" || k === "lane") ? EMPTY_HINT : HINTS[k]);
 const DRAFT_KEY = "fk-flow";
 let kind = "steps";
 const texts = { steps: null, lane: null, org: null, system: null, timeline: null, pa: null };   // null = ยังเป็นตัวอย่าง
@@ -223,6 +227,15 @@ function showMessages(r) {
       ul.append(li);
     }
     msg.append(ul);
+  }
+  /* ป้ายตอนชี้ไม่ขึ้นบนภาพ (ภาพนิ่ง) บอกว่าอยู่ที่ไหน (แผน v3 เฟส 4 แทนจุดบอกบนพรีวิว ซึ่งจะติดไปในไฟล์ที่ดาวน์โหลดด้วย) */
+  const tips = r.model ? r.model.nodes.filter((n) => n.tip).length : 0;
+  if (tips) {
+    const p = document.createElement("p");
+    p.className = "tipnote";
+    p.textContent = tr(`มีป้ายตอนชี้ ${tips} กล่อง ไม่ขึ้นบนภาพ แต่อยู่ในไฟล์ ชี้เมาส์ดูได้ในห้องแก้ไข (ลากแก้ต่อ) หรือตอนเปิดไฟล์ใน draw.io`,
+      `${pl(tips, "box has", "boxes have")} a hover note. Notes are not drawn on the image but are kept in the file, point at the box in the editor (Edit by hand) or in draw.io to see them`);
+    msg.append(p);
   }
 }
 
@@ -536,6 +549,7 @@ function update() {
   paintHighlight(r.error ? r.error.line : 0);
   showMessages(r);
   if (edited) { paintEditNote(); return; }        // ผังที่แก้ด้วยมือ ข้อความไม่วาดทับเอง (ผู้ใช้เลือกผ่านป้าย)
+  hint.textContent = hintFor(kind, !!r.empty);
   if (r.empty) {
     current = null; lastMmd = ""; img.hidden = true; setReady(false); editBtn.disabled = true;
     /* จอมือถือช่องพิมพ์อยู่อีกแผง (ปุ่ม ข้อความ ด้านบน) ไม่ใช่ข้างบนหรือทางซ้าย */
@@ -555,7 +569,9 @@ function update() {
   const model = r.model;
   /* ลู่ที่ไม่มีฝ่ายเลย: วาดเป็นผังขั้นตอนธรรมดา (คำเตือนบอกวิธีใส่ฝ่ายแล้ว) */
   const mmd = grid && grid.xml ? grid.xml : toMermaid(grid ? { ...model, kind: "steps" } : model);
-  if (mmd === lastMmd && current) {
+  /* ป้ายตอนชี้ (( )) ไม่อยู่ใน Mermaid ต้องนับรวมในตัวตัดสินว่าต้องวาดใหม่ไหม ไม่งั้นแก้แค่ป้ายแล้วผังไม่อัปเดต */
+  const drawKey = mmd + "\n%%tips " + model.nodes.map((n) => n.tip || "").join("\u0001");
+  if (drawKey === lastMmd && current) {
     current.name = fileName(model);               // ชื่อ: เปลี่ยนอย่างเดียว ผังไม่ต้องวาดใหม่
     setCanvas("ready"); setReady(true);
     return;
@@ -569,7 +585,7 @@ function update() {
     : engine.render(mmd, model.nodes.length, STRETCH[model.kind] || {}, edgeElbow(model), (x) => applyDefaults(x, grid ? { ...model, kind: "steps" } : model, look), out$);
   job.then((out) => {
     if (out.stale || my !== ver) return;
-    lastMmd = mmd;
+    lastMmd = drawKey;
     const alt = tr(`${KIND_NAME[model.kind]} ${model.nodes.length} กล่อง`, `${KIND_NAME[model.kind]} with ${model.nodes.length} boxes`);
     show(out.png, out.xml, fileName(model), alt, out$.scale);
     if (announceNext) { announceNext = false; announce(tr(`วาดเสร็จแล้ว ${alt}`, `Done, ${alt}`)); }

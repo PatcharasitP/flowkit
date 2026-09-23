@@ -142,6 +142,18 @@ console.log("\n━━ ⑤ เส้นวนกลับเป็นเส้น
   ck(D.backEdges(sm).size > 0 && F.dashedLoops(xmlOf("08-system"), sm) === xmlOf("08-system"), "ผังระบบมีวงจริงแต่ไม่ทำเส้นประ (ข้อมูลไหลสองทางเป็นเรื่องปกติ)");
 }
 
+console.log("\n━━ ป้ายตอนชี้ (แผน v3 เฟส 4) ━━");
+{
+  const m = model("02-renewal");
+  m.nodes.find((n) => n.id === "n5").tip = 'ห้ามเกิน "10%" <ปีละครั้ง> & ต้องมีบันทึก | ลงชื่อสองฝ่าย';
+  const out = D.addTips(xmlOf("02-renewal"), m);
+  const tag = (out.match(/<UserObject\b[^>]*mermaidId="n:n5"[^>]*>/) || [""])[0];
+  ck(tag.includes('tooltip="ห้ามเกิน &quot;10%&quot; &lt;ปีละครั้ง&gt; &amp; ต้องมีบันทึก&#10;ลงชื่อสองฝ่าย"'), "tooltip อยู่บนกล่องที่ถูกตัว อักขระพิเศษถูกกัน | เป็นขึ้นบรรทัด", tag.slice(0, 200));
+  ck((out.match(/tooltip="/g) || []).length === 1, "กล่องอื่นไม่ได้ป้าย");
+  ck(D.addTips(out, m) === out, "ใส่ซ้ำไม่ซ้อน");
+  ck(D.applyDefaults(xmlOf("02-renewal"), m, OFF).includes('tooltip="'), "ปิดค่าตั้งต้นทุกข้อ ป้ายที่ผู้ใช้พิมพ์ยังอยู่ (ไม่ใช่ค่าตั้งต้น)");
+}
+
 console.log("\n━━ ท่อรวมกับของพัง ━━");
 {
   const m = model("02-renewal");

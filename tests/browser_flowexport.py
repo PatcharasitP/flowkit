@@ -1,13 +1,14 @@
 # FlowKit v3 เฟส 3: ไฟล์ภาพที่เอาไปใช้ต่อได้จริง ผ่านหน้าเว็บจริง
 #   ความคมชัด 1 2 3 เท่า (ขนาดไฟล์ 1:2:3 แต่บนจอขนาดเท่าเดิม) , พื้นใส (alpha มุมภาพ = 0) , ปุ่ม PowerPoint (3 เท่า พื้นใส)
 #   ค่าที่ตั้งจำข้ามการโหลดหน้า , ภาพบนจอ = ไฟล์ที่ดาวน์โหลดทุกไบต์ (กติกาเดิมของ FlowKit)
+#   + เฟส 4 ป้ายตอนชี้ (( )) อยู่ในไฟล์ที่ส่งออกจริง ทั้งผังขั้นตอนและผังลู่ แก้แค่ป้ายแล้วผังอัปเดต
 # ‼️ ที่มาของตัวเลข: เฟส 0 ข้อ ค พิสูจน์แล้วว่า scale 1 2 3 ของตัวฝังได้ 534 1068 1602 (PROVEN 23/09/2026)
 # ใช้: ../.venv/bin/python tests/browser_flowexport.py   (--selftest = ตัวอ่าน alpha ต้องแยกภาพพื้นขาวกับพื้นใสได้)
 import sys, io, pathlib, traceback
 from playwright.sync_api import sync_playwright
 from PIL import Image
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from browser_flowkit import preview_png, drawio_xml, wait_ready, img_src
+from browser_flowkit import preview_png, drawio_xml, wait_ready, img_src, set_text
 from origin import DRAW
 
 SELFTEST = "--selftest" in sys.argv
@@ -91,6 +92,23 @@ def main():
         ck("พื้นใส และยังฝังผังไว้", corner_alpha(ppt) == 0 and bool(drawio_xml(ppt)))
         ck("ชื่อไฟล์บอกว่าเป็นของ PowerPoint", d.value.suggested_filename.endswith("-PowerPoint.drawio.png"), d.value.suggested_filename)
         ck("ภาพบนจอไม่เปลี่ยนหลังกด (ยังเป็นค่าที่ตั้งไว้)", preview_png(pg) == two)
+
+        print("\n━━ ป้ายตอนชี้ (( )) ━━")
+        def tooltips():
+            x = drawio_xml(preview_png(pg)) or ""
+            import re as _re
+            return _re.findall(r'tooltip="([^"]*)"', x)
+        for kind, text in (("steps", "เริ่มงาน\nตรวจเอกสาร (( ต้องมีสำเนาบัตร ))\nจบงานนี้"),
+                           ("lane", "[ผู้ขอ] ส่งเอกสาร\n[บัญชี] ตรวจเอกสาร (( ต้องมีสำเนาบัตร ))\n[การเงิน] โอนเงิน")):
+            pg.click(f"#types [data-kind={kind}]"); set_text(pg, text)
+            # ‼️ รอผลสุดท้าย ไม่รอ "ภาพใบถัดไป": สลับเป็นผังลู่แล้วผังตัวอย่างของลู่วาดเสร็จก่อนข้อความใหม่ (จับได้ 23/09/2026)
+            for _ in range(60):
+                if tooltips() == ["ต้องมีสำเนาบัตร"] and "ป้ายตอนชี้" in pg.inner_text("#msg"): break
+                pg.wait_for_timeout(500)
+            ck(f"[{kind}] ป้ายอยู่ในไฟล์ PNG ที่ส่งออก", tooltips() == ["ต้องมีสำเนาบัตร"], str(tooltips()))
+            ck(f"[{kind}] บนจอบอกว่ามีป้าย 1 กล่องและดูได้ที่ไหน", "ป้ายตอนชี้ 1 กล่อง" in pg.inner_text("#msg"), pg.inner_text("#msg"))
+            before = img_src(pg); set_text(pg, text.replace("ต้องมีสำเนาบัตร", "ต้องมีสำเนาทะเบียนบ้าน")); wait_ready(pg, before)
+            ck(f"[{kind}] แก้แค่ข้อความในป้าย ผังวาดใหม่และป้ายในไฟล์เปลี่ยนตาม", tooltips() == ["ต้องมีสำเนาทะเบียนบ้าน"], str(tooltips()))
         ck("ไม่มี error บนหน้า", not errs, str(errs[:2]))
         b.close()
     return finish()

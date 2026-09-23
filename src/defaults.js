@@ -170,6 +170,20 @@ export function dashedLoops(xml, model) {
   });
 }
 
+/** ป้ายตอนชี้ (แผน v3 เฟส 4) ใส่ tooltip บนกล่องที่มี tip ไม่ใช่ค่าตั้งต้นที่ปิดได้ เป็นของที่ผู้ใช้พิมพ์เอง
+ *  พิสูจน์ 23/09/2026 เฟส 0 ข้อ ง: tooltip บน UserObject รอดใน xmlpng และโผล่ตอนชี้ในห้องแก้ไข
+ *  ใช้ได้ทั้งผังจาก Mermaid และผังลู่ (mermaidId เดียวกัน) */
+const xmlEsc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/\n/g, "&#10;");
+export function addTips(xml, model) {
+  const tips = new Map((model && model.nodes || []).filter((n) => n.tip).map((n) => [n.id, n.tip]));
+  if (!tips.size) return String(xml);
+  return String(xml).replace(/<UserObject\b[^>]*>/g, (tag) => {
+    const m = tag.match(/mermaidId="n:(n\d+)"/);
+    if (!m || !tips.has(m[1]) || /\stooltip="/.test(tag)) return tag;
+    return tag.replace(/>$/, ` tooltip="${xmlEsc(tips.get(m[1]).replace(/ \| /g, "\n"))}">`);
+  });
+}
+
 /** ท่อรวม on = { jumps, floating, uniform, semantic, loops } ข้อที่ไม่ได้ส่งมาถือว่าเปิด
  *  ‼️ พังข้อไหน คืน xml ก่อนข้อนั้น ผังต้องวาดได้เสมอแม้ค่าตั้งต้นพัง */
 export function applyDefaults(xml, model, on = {}) {
@@ -182,6 +196,7 @@ export function applyDefaults(xml, model, on = {}) {
     ["jumps", (x) => lineJumps(x)],
   ];
   let out = String(xml);
+  try { out = addTips(out, model); } catch { /* ข้ามป้าย ผังยังขึ้น */ }
   for (const [k, fn] of steps) {
     if (on[k] === false) continue;
     try { out = fn(out); } catch { /* ข้ามข้อนี้ */ }

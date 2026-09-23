@@ -14,6 +14,19 @@ const PARSERS = { steps: parseSteps, lane: parseSteps, org: parseOrg, system: pa
 /** ผังใหญ่เกินเท่านี้ใส่สไลด์เดียวอ่านยาก (D6 , หลุม H3) */
 export const BIG_DIAGRAM = 25;
 
+/** ป้ายตอนชี้ของบรรทัด → กล่องที่ข้อความของบรรทัดนั้นลงท้ายด้วยข้อความของกล่อง (หลัง ป้ายกิ่ง: หรือ [ฝ่าย]) เลือกกล่องที่ยาวสุดที่ตรง
+ *  บรรทัดที่ไม่ใช่กล่อง (เช่นเส้นของผังระบบ A -> B: ส่งข้อมูล) เตือนแทนการเดา */
+function attachTips(model, lines) {
+  for (const l of lines) {
+    if (!l.tip) continue;
+    const hit = model.nodes.filter((n) => l.text === n.text || l.text.endsWith(" " + n.text) || l.text.endsWith("]" + n.text) || l.text.endsWith(":" + n.text))
+      .sort((a, b) => b.text.length - a.text.length)[0];
+    if (hit) hit.tip = hit.tip ? `${hit.tip} | ${l.tip}` : l.tip;
+    else model.warnings.push({ line: l.no, text: tr("ป้ายตอนชี้ (( )) ใส่ได้ท้ายบรรทัดที่เป็นกล่อง บรรทัดนี้ไม่มีกล่อง จึงไม่ได้ใส่ป้าย",
+      "A hover note (( )) goes at the end of a line that is a box, this line has no box so the note was left out") });
+  }
+}
+
 /** @returns {{ model } | { error: FlowError }} ไม่โยนออกไป หน้าเว็บจะได้โชว์ข้อผิดพลาดพร้อมเลขบรรทัดได้เสมอ */
 export function parseText(text, uiKind = "steps") {
   try {
@@ -22,6 +35,7 @@ export function parseText(text, uiKind = "steps") {
     const kind = head.kind || uiKind;
     const model = PARSERS[kind](lines, warnings);
     model.kind = kind;
+    attachTips(model, lines);
     if (head.title) model.title = head.title;
     if (head.dir) model.dir = head.dir;
     if (model.nodes.length > BIG_DIAGRAM) {

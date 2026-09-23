@@ -20,6 +20,11 @@ const DIR_WORDS = {
  *    ต้องตามด้วยวรรคเสมอ ไม่งั้น "-30%" หรือ "1.5 เท่า" ที่เป็นเนื้อความจะถูกตัดไปด้วย */
 const BULLET = /^(?:→|->|>|-|•|\*|\d{1,3}[.)]|[๐-๙]{1,3}[.)])\s+/;
 
+/* ป้ายอธิบายตอนชี้ (แผน v3 เฟส 4 , SPEC 3.2) วงเล็บคู่สองชั้นท้ายบรรทัด  ตรวจเอกสาร (( ต้องมีสำเนาบัตร ))
+ * ‼️ ท้ายบรรทัดเท่านั้น และต้องปิดครบ ((ที่ไม่ปิด กับวงเล็บชั้นเดียว (กลม) เป็นข้อความธรรมดาเหมือนเดิม
+ * ‼️ ไม่ใช้ # เพราะชนกับ // หมายเหตุ และเลขข้อ */
+const TIP = /^(.*?)\s*\(\((?!\()\s*(.+?)\s*\)\)$/;
+
 /**
  * แยกข้อความเป็นบรรทัดที่พร้อมใช้ + หัวไฟล์
  * @returns {{ head: {kind?, dir?, title?}, lines: {no, indent, text}[], warnings: {line, text}[] }}
@@ -67,7 +72,9 @@ export function prepare(raw) {
         tr("ย่อหน้าทีละ 2 วรรค (หรือ tab เดียว) ต่อชั้น", "Indent one level at a time: 2 spaces or one tab"));
     }
     prevIndent = indent;
-    lines.push({ no, indent, text: body.replace(BULLET, "").trim() });
+    const t = body.replace(BULLET, "").trim();
+    const tip = t.match(TIP);
+    lines.push(tip ? { no, indent, text: tip[1].trim(), tip: tip[2].trim() } : { no, indent, text: t });
   });
   return { head, lines, warnings };
 }
