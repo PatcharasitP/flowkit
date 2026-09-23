@@ -7,6 +7,8 @@
 #
 # --selftest ป้อนของผิดให้ตัวตรวจทีละตัว แล้วตัวตรวจต้องจับได้ (ตัวตรวจที่ไม่เคยแดงเชื่อไม่ได้)
 
+import datetime
+TODAY = datetime.date.today().isoformat()   # ชื่อไฟล์มีวันที่ในเครื่อง (แผน v3 เฟส 3 ข้อ 5)
 import sys, os, re, json, base64, hashlib, struct, html, urllib.parse, tempfile, shutil, pathlib, traceback
 from playwright.sync_api import sync_playwright
 
@@ -337,7 +339,7 @@ def main():
         dlf = d.value
         path = TMP / "got.png"; dlf.save_as(str(path))
         data = path.read_bytes()
-        ck("ชื่อไฟล์มาจาก ชื่อ: ตัดอักขระที่ชื่อไฟล์ใช้ไม่ได้ ลงท้าย .drawio.png", dlf.suggested_filename == "แผนต่อสัญญา ปี 2569.drawio.png", repr(dlf.suggested_filename))
+        ck("ชื่อไฟล์มาจาก ชื่อ: ตัดอักขระที่ชื่อไฟล์ใช้ไม่ได้ ต่อด้วยชนิดผังกับวันที่ ลงท้าย .drawio.png", dlf.suggested_filename == f"แผนต่อสัญญา ปี 2569-ขั้นตอน-{TODAY}.drawio.png", repr(dlf.suggested_filename))
         ck("ไฟล์ที่ได้ตรงกับภาพบนจอทุกไบต์ (เห็นแบบไหน ได้แบบนั้น)", hashlib.sha256(data).hexdigest() == hashlib.sha256(preview_png(pg)).hexdigest())
         dx = drawio_xml(data) or ""
         ck("ไฟล์ที่ดาวน์โหลดมีผัง draw.io ฝังอยู่ ครบทุกกล่อง", sorted(t for t, _ in cells(dx)) == sorted(["เริ่มงาน", "ตรวจสัญญา", MARK, "จบงานนี้"]),
@@ -348,12 +350,12 @@ def main():
         svg_path = TMP / "got.svg"; d.value.save_as(str(svg_path)); svg = svg_path.read_text(encoding="utf-8")
         content = re.search(r'<svg\b[^>]*\scontent="([^"]*)"', svg)
         ck("โหลดแบบ SVG ได้ชื่อเดียวกัน ฝังฟอนต์ Sarabun ในไฟล์ (เปิดเครื่องที่ไม่มีฟอนต์แล้วไทยไม่เพี้ยน)",
-           d.value.suggested_filename == "แผนต่อสัญญา ปี 2569.svg" and svg.count("@font-face") >= 1, f"{d.value.suggested_filename} font-face {svg.count('@font-face')}")
+           d.value.suggested_filename == f"แผนต่อสัญญา ปี 2569-ขั้นตอน-{TODAY}.svg" and svg.count("@font-face") >= 1, f"{d.value.suggested_filename} font-face {svg.count('@font-face')}")
         ck("SVG ที่ได้ฝังผังไว้ด้วย เปิดกลับมาแก้ใน draw.io ได้", bool(content) and "mxfile" in html.unescape(content.group(1)))
         with pg.expect_download() as d:
             pg.click("#dlxml")
         xml_path = TMP / "got.drawio"; d.value.save_as(str(xml_path)); xtext = xml_path.read_text(encoding="utf-8")
-        ck("โหลดแบบ .drawio ได้ XML ของผังครบทุกกล่อง", d.value.suggested_filename == "แผนต่อสัญญา ปี 2569.drawio"
+        ck("โหลดแบบ .drawio ได้ XML ของผังครบทุกกล่อง", d.value.suggested_filename == f"แผนต่อสัญญา ปี 2569-ขั้นตอน-{TODAY}.drawio"
            and sorted(t for t, _ in cells(xtext)) == sorted(["เริ่มงาน", "ตรวจสัญญา", MARK, "จบงานนี้"]), d.value.suggested_filename)
         # วาง XML ของ draw.io ลงช่องพิมพ์ = เปิดเป็นผังในห้องแก้ไข (แผนเฟส 5 ทางเข้า ④)
         before_text = pg.input_value("#src")

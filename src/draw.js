@@ -25,7 +25,7 @@ const canvas = $("#canvas"), img = $("#png"), cvmsg = $("#cvmsg"), cvnote = $("#
 const editBtn = $("#edit"), room = $("#room"), fileIn = $("#filein"), dlSvg = $("#dlsvg"), dlXml = $("#dlxml");
 const sendBtns = [...document.querySelectorAll("[data-send]")];
 /** ปุ่มที่ใช้ได้เมื่อมีผังพร้อม (ดาวน์โหลด , แบบอื่น , ส่งต่อ) เปิดปิดพร้อมกันเสมอ */
-const setReady = (on) => { for (const b of [dl, dlSvg, dlXml, ...sendBtns]) b.disabled = !on; };
+const setReady = (on) => { for (const b of [dl, dlSvg, dlXml, $("#dlppt"), ...sendBtns]) b.disabled = !on; };
 const KINDS = ["steps", "lane", "org", "system", "timeline", "pa"];        // pa = flow ของ Power Automate (ช่องพิมพ์รับ JSON)
 const SAMPLE = SAMPLES[IS_EN ? "en" : "th"];
 const DEBOUNCE_MS = 400;                          // แผนเฟส 2 ข้อ 5
@@ -298,17 +298,21 @@ const engine = createEngine({
 });
 function retry() { engine.retry(); lastMmd = ""; update(); }
 
-/** ชื่อไฟล์จาก ชื่อ: หรือกล่องแรก (แผนเฟส 3 ข้อ 1) */
+/** ชื่อไฟล์จาก ชื่อ: หรือกล่องแรก (แผนเฟส 3 ข้อ 1) + ชนิดผังกับวันที่ (แผน v3 เฟส 3 ข้อ 5) เช่น ขออนุมัติ-ลู่-2026-09-23.drawio.png
+ *  ทำหลายรุ่นในวันเดียวกันแล้วแยกออกว่าไฟล์ไหนเป็นผังแบบไหน วันที่เป็นเวลาในเครื่องผู้ใช้ */
+const KIND_SHORT = { steps: tr("ขั้นตอน", "process"), lane: tr("ลู่", "lanes"), org: tr("องค์กร", "org"), system: tr("ระบบ", "systems"),
+  timeline: tr("ไทม์ไลน์", "timeline"), pa: "PowerAutomate" };
+const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 function fileName(model) {
   const raw = model.title || (model.nodes[0] ? model.nodes[0].text.split(" | ")[0] : "") || "FlowKit";
   const safe = raw.replace(/[\\/:*?"<>|#%\u0000-\u001f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60).trim();
-  return (safe || "FlowKit") + ".drawio.png";
+  return `${safe || "FlowKit"}-${KIND_SHORT[model.kind] || model.kind}-${today()}.drawio.png`;
 }
 const KIND_NAME = { steps: tr("ผังขั้นตอน", "Process diagram"), lane: tr("ผังใครทำอะไร", "Who does what diagram"), org: tr("ผังองค์กร", "Org chart"),
   system: tr("ผังระบบ", "Systems diagram"), timeline: tr("ไทม์ไลน์", "Timeline"), pa: tr("ผัง Power Automate", "Power Automate flow") };
 
 /** เอาภาพผัง (PNG ฝัง XML) ขึ้นจอ และเป็นไฟล์ที่ปุ่มดาวน์โหลดจะให้ */
-function show(png, xml, name, alt) {
+function show(png, xml, name, alt, scale = 2) {
   if (current) URL.revokeObjectURL(current.url);
   current = { blob: png, url: URL.createObjectURL(png), name, xml };
   unzoom();
@@ -317,7 +321,7 @@ function show(png, xml, name, alt) {
      ‼️ ห้ามใส่ src คู่กัน: src นับเป็นตัวเลือก 1x จอความละเอียดปกติจึงเลือก src แล้วผังโตสองเท่า
         (วัดจริง naturalWidth 626 บนจอ 1x กับ 313 บนจอ 2x ภาพเดียวกัน) */
   img.removeAttribute("src");
-  img.srcset = `${current.url} 2x`;
+  img.srcset = `${current.url} ${scale}x`;         // ความคมชัดที่เลือก (แผน v3 เฟส 3) ขนาดบนจอเท่าเดิมทุกค่า
   img.alt = alt;
   img.hidden = false;
   setCanvas("ready");
@@ -358,10 +362,10 @@ function paintEditNote() {
     lay.textContent = tr("จัดวางใหม่", "Tidy the layout");
     lay.addEventListener("click", () => {
       lay.disabled = true;
-      engine.relayout(current.xml).then((out) => {
+      engine.relayout(current.xml, exp).then((out) => {
         savedRecord = { xml: out.xml, name: current.name, text: edited.text, kind: edited.kind };
         writeRecord(savedRecord);
-        show(out.png, out.xml, current.name, tr("ผังที่แก้ด้วยมือ", "Diagram with manual edits"));
+        show(out.png, out.xml, current.name, tr("ผังที่แก้ด้วยมือ", "Diagram with manual edits"), exp.scale);
         paintEditNote();
       }, (e) => { console.warn("FlowKit relayout", e); lay.disabled = false; });
     });
@@ -378,6 +382,8 @@ const editor = createEditor({
     writeRecord(savedRecord);
     show(png, xml, editName, tr("ผังที่แก้ด้วยมือ", "Diagram with manual edits"));
     paintEditNote();
+    /* PNG จากห้องแก้ไขเป็น 2 เท่าพื้นขาวเสมอ ถ้าตั้งไว้ต่างจากนั้น วาดซ้ำด้วยค่าที่ตั้ง ไฟล์ที่ดาวน์โหลดจึงตรงกับที่เลือก */
+    if (exp.scale !== 2 || exp.transparent) redrawEdited();
   },
   onClose() {
     roomTip.hidden = true;
@@ -497,6 +503,10 @@ paSel.addEventListener("change", () => { view = paSel.value; announceNext = true
 const LOOK_KEY = "fk-look";
 const look = Object.fromEntries(DEFAULTS.map((d) => [d.key, d.on]));
 try { Object.assign(look, JSON.parse(localStorage.getItem(LOOK_KEY) || "{}")); } catch { /* โหมดส่วนตัว หรือค่าเสีย */ }
+/* ไฟล์ภาพ (แผน v3 เฟส 3) ความคมชัด 1 2 3 เท่า กับพื้นใส จำไว้ใน localStorage แบบเดียวกับหน้าตาผัง */
+const EXP_KEY = "fk-export";
+const exp = { scale: 2, transparent: false };
+try { const e = JSON.parse(localStorage.getItem(EXP_KEY) || "{}"); if ([1, 2, 3].includes(e.scale)) exp.scale = e.scale; exp.transparent = e.transparent === true; } catch { /* โหมดส่วนตัว */ }
 let lastMmd = "", current = null, ver = 0, timer = 0;
 /* ตัวคำนวณผังลู่ โหลดครั้งแรกที่ต้องใช้ , วัดความกว้างข้อความด้วยฟอนต์ Sarabun ตัวเดียวกับที่ draw.io วาด (PROVEN 23/09 ข้อ 5)
    ‼️ รอฟอนต์โหลดเสร็จก่อนวัด ไม่งั้นได้ความกว้างของฟอนต์สำรอง กล่องล้นหรือโบ๋ */
@@ -554,13 +564,14 @@ function update() {
   live.dataset.busy = "";
   /* ‼️ ห้ามทับข้อความต่อไม่ได้ด้วย "กำลังวาด" (เคยทับจนผู้ใช้ออฟไลน์ไม่รู้ว่าทำไมผังไม่ขึ้น จับได้ใน tests/browser_swpages.py) */
   if (!current && !engineDown() && canvas.dataset.state !== "booting") setCanvas("booting", [tr("กำลังวาดผัง", "Drawing")]);
-  const job = grid && grid.xml ? engine.renderXml(applyDefaults(grid.xml, model, look))
-    : engine.render(mmd, model.nodes.length, STRETCH[model.kind] || {}, edgeElbow(model), (x) => applyDefaults(x, grid ? { ...model, kind: "steps" } : model, look));
+  const out$ = { ...exp };
+  const job = grid && grid.xml ? engine.renderXml(applyDefaults(grid.xml, model, look), out$)
+    : engine.render(mmd, model.nodes.length, STRETCH[model.kind] || {}, edgeElbow(model), (x) => applyDefaults(x, grid ? { ...model, kind: "steps" } : model, look), out$);
   job.then((out) => {
     if (out.stale || my !== ver) return;
     lastMmd = mmd;
     const alt = tr(`${KIND_NAME[model.kind]} ${model.nodes.length} กล่อง`, `${KIND_NAME[model.kind]} with ${model.nodes.length} boxes`);
-    show(out.png, out.xml, fileName(model), alt);
+    show(out.png, out.xml, fileName(model), alt, out$.scale);
     if (announceNext) { announceNext = false; announce(tr(`วาดเสร็จแล้ว ${alt}`, `Done, ${alt}`)); }
   }, (e) => {
     if (my !== ver || (e && e.kind === "reset")) return;   // reset = ผู้ใช้กดลองใหม่ งานนี้ถูกแทนด้วยรอบใหม่แล้ว
@@ -650,6 +661,13 @@ for (const d of document.querySelectorAll(".dlg")) {
       update();
     });
   }
+  for (const r of dlg.querySelectorAll("[name=scale]")) {
+    r.checked = Number(r.value) === exp.scale;
+    r.addEventListener("change", () => { if (r.checked) { exp.scale = Number(r.value); expChanged(); } });
+  }
+  const clear = dlg.querySelector("#look-clear");
+  clear.checked = exp.transparent;
+  clear.addEventListener("change", () => { exp.transparent = clear.checked; expChanged(); });
   $("#openlook").addEventListener("click", () => dlg.showModal());
 }
 {
@@ -698,13 +716,36 @@ dlXml.addEventListener("click", () => {
   if (!current || !current.xml) return;
   save(new Blob([current.xml], { type: "application/vnd.jgraph.mxfile" }), baseName() + ".drawio");
 });
-/* ── ส่งต่อเข้าเครื่องมือของ FileKit (แผนเฟส 3 ข้อ 5 , D5) ไม่ต้องดาวน์โหลดแล้วอัปโหลดซ้ำ ── */
+function expChanged() {
+  try { exp.scale === 2 && !exp.transparent ? localStorage.removeItem(EXP_KEY) : localStorage.setItem(EXP_KEY, JSON.stringify(exp)); } catch { /* โหมดส่วนตัว */ }
+  if (edited) redrawEdited(); else { lastMmd = ""; update(); }
+}
+/** ผังที่แก้ด้วยมือ วาดซ้ำจาก xml ของมันด้วยค่าไฟล์ภาพปัจจุบัน */
+function redrawEdited() {
+  if (!current || !current.xml) return;
+  const name = current.name, s = exp.scale;
+  engine.renderXml(current.xml, { ...exp }).then((out) => { if (!out.stale && edited) { show(out.png, out.xml, name, tr("ผังที่แก้ด้วยมือ", "Diagram with manual edits"), s); paintEditNote(); } }, () => {});
+}
+/* ── PowerPoint (แผน v3 เฟส 3 ข้อ 4): PNG 3 เท่า พื้นใส ไม่ขึ้นกับค่าที่ตั้งไว้
+ *    ‼️ ไม่ใช่ SVG: วาง SVG ใน PowerPoint แล้วตัวหนังสือไทยเพี้ยน (PROVEN 22/09/2026) ── */
+const dlPpt = $("#dlppt");
+dlPpt.addEventListener("click", () => {
+  if (!current || !current.xml) return;
+  dlPpt.disabled = true;
+  engine.exportPng(current.xml, { scale: 3, transparent: true }).then(({ png }) => save(png, baseName() + "-PowerPoint.drawio.png"), (e) => {
+    console.warn("FlowKit ppt", e);
+    fileProblem(tr("ทำภาพสำหรับ PowerPoint ไม่สำเร็จ ลองอีกครั้ง", "Could not make the PowerPoint image, try again"));
+  }).finally(() => { dlPpt.disabled = !current; });
+});
+/* ── ส่งต่อเข้าเครื่องมือของ FileKit (แผนเฟส 3 ข้อ 5 , D5) ไม่ต้องดาวน์โหลดแล้วอัปโหลดซ้ำ ──
+ *    รวมเป็น PDF ใช้ภาพ 3 เท่าพื้นขาวเสมอ (แผน v3 เฟส 3 ข้อ 3) พิมพ์แล้วคม ไม่ส่งผังไปเซิร์ฟเวอร์ของ draw.io (PROVEN P6) */
 for (const b of sendBtns) b.addEventListener("click", async () => {
   if (!current) return;
   for (const x of sendBtns) x.disabled = true;
   try {
     const { send } = await loadHandoff();
-    await send([new File([current.blob], current.name, { type: "image/png" })], b.dataset.send);
+    const blob = b.dataset.send === "images-to-pdf" && current.xml ? (await engine.exportPng(current.xml, { scale: 3 })).png : current.blob;
+    await send([new File([blob], current.name, { type: "image/png" })], b.dataset.send);
     location.href = FILEKIT + "#/" + b.dataset.send;
   } catch (e) {
     console.warn("FlowKit handoff", e);
@@ -743,9 +784,9 @@ engine.boot();                                    // ออฟไลน์ตั
   if (handEdited) {
     edited = { text: rec.text, kind: rec.kind }; savedRecord = rec; editName = rec.name || "FlowKit.drawio.png";
     showMessages(parseText(ta.value, kind));
-    engine.renderXml(rec.xml).then((out) => {
+    engine.renderXml(rec.xml, exp).then((out) => {
       if (out.stale || !edited) return;
-      show(out.png, out.xml, editName, tr("ผังที่แก้ด้วยมือ", "Diagram with manual edits"));
+      show(out.png, out.xml, editName, tr("ผังที่แก้ด้วยมือ", "Diagram with manual edits"), exp.scale);
       paintEditNote();
     }, () => { edited = null; writeRecord(null); update(); });
   }

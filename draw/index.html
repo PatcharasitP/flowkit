@@ -111,7 +111,8 @@
     <p class="more" id="more">
       <span class="more-g"><span data-en="Also save as">โหลดแบบอื่น</span>
         <button class="linkbtn" id="dlsvg" type="button" disabled>SVG</button> ,
-        <button class="linkbtn" id="dlxml" type="button" disabled>.drawio</button></span>
+        <button class="linkbtn" id="dlxml" type="button" disabled>.drawio</button> ,
+        <button class="linkbtn" id="dlppt" type="button" disabled data-en-al="PowerPoint: a 3x image with a clear background" aria-label="PowerPoint: ภาพ 3 เท่า พื้นใส">PowerPoint</button></span>
       <span class="more-g"><span data-en="Continue in FileKit">ส่งต่อใน FileKit</span>
         <button class="linkbtn" type="button" data-send="images-to-pdf" disabled data-en="Make a PDF">รวมเป็น PDF</button> ,
         <button class="linkbtn" type="button" data-send="image-resize" disabled data-en="Shrink it">ย่อรูป</button> ,
@@ -172,6 +173,14 @@
     <label class="look"><input type="checkbox" data-look="loops"> <span data-en="Lines that go back are dashed">เส้นที่วนกลับเป็นเส้นประ</span></label>
   </div>
   <p class="dlg-note" data-en="Applies to diagrams drawn from text, a diagram you edited by hand stays as it is">ใช้กับผังที่วาดจากข้อความ ผังที่แก้ด้วยมือแล้วจะไม่เปลี่ยน</p>
+  <h3 class="look-h" data-en="Image file">ไฟล์ภาพ</h3>
+  <div class="look-list" role="radiogroup" aria-label="ความคมชัด" data-en-al="Sharpness">
+    <label class="look"><input type="radio" name="scale" value="1"> <span data-en="1x, for the screen">1 เท่า สำหรับดูบนจอ</span></label>
+    <label class="look"><input type="radio" name="scale" value="2"> <span data-en="2x, sharp on most screens">2 เท่า คมบนจอทั่วไป</span></label>
+    <label class="look"><input type="radio" name="scale" value="3"> <span data-en="3x, for print or big slides">3 เท่า สำหรับพิมพ์หรือสไลด์ใหญ่</span></label>
+    <label class="look"><input type="checkbox" id="look-clear"> <span data-en="Clear background">พื้นหลังโปร่งใส</span></label>
+  </div>
+  <p class="dlg-note" data-en="For PowerPoint use the PowerPoint button, a 3x image with a clear background. An SVG pasted into PowerPoint garbles Thai text.">วางใน PowerPoint ใช้ปุ่ม PowerPoint ได้ภาพ 3 เท่า พื้นใส ไฟล์ SVG วางใน PowerPoint แล้วตัวหนังสือไทยเพี้ยน</p>
 </dialog>
 
 <!-- ห้องแก้ไข (แผนเฟส 3) draw.io ตัวเต็มจอ ปุ่มบันทึกกับออกเป็นของ draw.io เอง src/editor.js สร้าง iframe ตอนเปิดครั้งแรก -->

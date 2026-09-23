@@ -209,6 +209,7 @@ h1{margin:0; font-size:24px; font-weight:700; line-height:1.35}
 /* หน้าตาผัง (v3 เฟส 1) แถวละสวิตช์ กดได้ทั้งแถว */
 .look-list{display:flex; flex-direction:column; gap:2px}
 .look{display:flex; align-items:center; gap:10px; min-height:44px; padding:4px 2px; font-size:14.5px; line-height:1.5; cursor:pointer}
+.look-h{margin:16px 0 4px; font-size:15px; font-weight:700}
 .look input{width:18px; height:18px; margin:0; accent-color:var(--brand-text); flex:none}
 @media (max-width:520px){ .tpl-list{grid-template-columns:1fr} .dlg{padding:20px 16px 16px} }
 .linkbtn{padding:0; border:0; background:none; color:var(--brand-text); font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:3px}

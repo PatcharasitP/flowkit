@@ -277,6 +277,9 @@ export function createEngine({ onState = () => {} } = {}) {
   }
 
   const PNG_OUT = { action: "export", format: "xmlpng", scale: 2, border: 16, background: "#ffffff" };
+  /* ความคมชัดกับพื้นใส (แผน v3 เฟส 3) พิสูจน์ 23/09/2026 เฟส 0 ข้อ ค: scale 1 2 3 ได้ขนาด 1:2:3 พอดี ,
+     background "none" = PNG โปร่งใสจริง (alpha มุม 0) กล่องยังพื้นขาว XML ยังฝังอยู่ */
+  const pngOut = (o = {}) => ({ ...PNG_OUT, scale: [1, 2, 3].includes(o.scale) ? o.scale : 2, background: o.transparent ? "none" : "#ffffff" });
 
   /** งานหนึ่งชิ้น: วาดจาก Mermaid , วาด xml เดิม , จัดวางใหม่ , หรือส่งออก SVG */
   async function drawOnce(job) {
@@ -302,7 +305,7 @@ export function createEngine({ onState = () => {} } = {}) {
           if (laid.xml) await call({ action: "load", autosave: 0, xml: elbowEdges(laid.xml, "v") }, "load");
         }
       }
-      const o = await call(PNG_OUT, "export");
+      const o = await call(pngOut(job.out), "export");
       return { png: pngBlob(o.data), xml: o.xml || job.xml };
     }
     const first = await call({ action: "load", autosave: 0, descriptor: { format: "mermaid", data: job.mermaid } }, "load");
@@ -315,7 +318,7 @@ export function createEngine({ onState = () => {} } = {}) {
     let xml = base;
     if (job.post) { try { xml = job.post(base) || base; } catch { xml = base; } }
     await call({ action: "load", autosave: 0, xml }, "load");
-    const out = await call(PNG_OUT, "export");
+    const out = await call(pngOut(job.out), "export");
     return { png: pngBlob(out.data), xml: out.xml || xml };
   }
 
@@ -345,11 +348,14 @@ export function createEngine({ onState = () => {} } = {}) {
   return {
     /** elbow: "v" | "h" = เส้นหักฉากแบบผังองค์กร (edgeElbow ใน to-mermaid.js) , null = เส้นโค้งของ Mermaid
      *  post: xml → xml ขั้นสุดท้ายก่อนวาด (ค่าตั้งต้นใน defaults.js) */
-    render(mermaid, expectBoxes = 0, stretch = {}, elbow = null, post = null) { return enqueue({ mermaid, expectBoxes, stretch, elbow, post }, true); },
-    /** วาด xml ของ draw.io ที่มีอยู่แล้วเป็น PNG (ผังที่แก้ด้วยมือ กู้คืนหลังโหลดหน้าใหม่) */
-    renderXml(xml) { return enqueue({ xml }, true); },
+    render(mermaid, expectBoxes = 0, stretch = {}, elbow = null, post = null, out = {}) { return enqueue({ mermaid, expectBoxes, stretch, elbow, post, out }, true); },
+    /** วาด xml ของ draw.io ที่มีอยู่แล้วเป็น PNG (ผังที่แก้ด้วยมือ กู้คืนหลังโหลดหน้าใหม่ , ผังลู่จาก grid.js)
+     *  out = { scale: 1|2|3 , transparent } ใช้กับ render ด้วย */
+    renderXml(xml, out = {}) { return enqueue({ xml, out }, true); },
+    /** ส่งออก PNG ครั้งเดียวด้วยค่าที่ต่างจากพรีวิว (ปุ่ม PowerPoint , ทำ PDF) งานที่ผู้ใช้กดเอง ห้ามถูกทิ้ง */
+    exportPng(xml, out = {}) { return enqueue({ xml, out }, false); },
     /** จัดวางกล่องใหม่ทั้งผัง (ผังที่แก้ด้วยมือจนเละ) คืน PNG กับ xml ใหม่ */
-    relayout(xml) { return enqueue({ xml, layout: true }, false); },
+    relayout(xml, out = {}) { return enqueue({ xml, layout: true, out }, false); },
     /** ส่งออกเป็น SVG ที่ฝังทั้งฟอนต์และผัง (เปิดกลับมาแก้ใน draw.io ได้) */
     exportSvg(xml) { return enqueue({ xml, svg: true }, false); },
     /** เริ่มใหม่ทั้งตัว (ปุ่มลองใหม่ หรือเน็ตกลับมา) งานที่ค้างรอ iframe ตัวเก่าจบด้วย reset ไม่ค้างคิว */

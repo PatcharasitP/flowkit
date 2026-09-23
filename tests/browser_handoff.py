@@ -33,7 +33,8 @@ SHA = """async (b64) => { const bin = atob(b64), u = new Uint8Array(bin.length);
   const d = await crypto.subtle.digest('SHA-256', u); return [...new Uint8Array(d)].map((x) => x.toString(16).padStart(2, '0')).join(''); }"""
 CARRIED = """async () => { const m = await import('./src/ui.js'); const f = (m.carryFiles() || [])[0]; if (!f) return null;
   const d = await crypto.subtle.digest('SHA-256', new Uint8Array(await f.arrayBuffer()));
-  return { name: f.name, sha: [...new Uint8Array(d)].map((x) => x.toString(16).padStart(2, '0')).join('') }; }"""
+  const u = new Uint8Array(await f.arrayBuffer()), w = (u[16] << 24 | u[17] << 16 | u[18] << 8 | u[19]) >>> 0;
+  return { name: f.name, width: w, sha: [...new Uint8Array(d)].map((x) => x.toString(16).padStart(2, '0')).join('') }; }"""
 PENDING = """() => new Promise((r) => { const q = indexedDB.open('fk-handoff', 1);
   q.onupgradeneeded = () => q.result.createObjectStore('box');
   q.onsuccess = () => { const g = q.result.transaction('box').objectStore('box').get('pending'); g.onsuccess = () => { r(g.result ? g.result.tool : null); q.result.close(); }; };
@@ -74,7 +75,7 @@ def main():
         for tool in TARGETS:
             print(f"\n━━ ส่งเข้า {tool} ━━")
             flow_ready(pg)
-            sha = hashlib.sha256(preview_png(pg)).hexdigest()
+            prev = preview_png(pg); sha = hashlib.sha256(prev).hexdigest(); width = int.from_bytes(prev[16:20], "big")
             with pg.expect_navigation():
                 pg.click(f"[data-send={tool}]")
             # ‼️ รอแบบวนถามเอง ไม่ใช้ wait_for_function กับฟังก์ชัน async: บนเว็บจริงหน้าเปลี่ยนระหว่างรอ
@@ -89,8 +90,13 @@ def main():
                 if got: break
                 pg.wait_for_timeout(500)
             ck(f"[{tool}] กดแล้วไปที่เครื่องมือนั้นใน FileKit แท็บเดิม", pg.url == FILEKIT + "/#/" + tool, pg.url)
-            ck(f"[{tool}] ไฟล์ไปถึงกล่องรับของเครื่องมือเลย ไม่ต้องเลือกไฟล์ใหม่ ตรงกับภาพบนจอทุกไบต์",
-               bool(got) and got["sha"] == sha and got["name"].endswith(".drawio.png"), str(got and got["name"]))
+            if tool == "images-to-pdf":
+                # แผน v3 เฟส 3 ข้อ 3: PDF ใช้ภาพ 3 เท่าเสมอ (พรีวิวตั้งต้น 2 เท่า) จึงกว้าง 1.5 เท่าของภาพบนจอ ไม่ใช่ไบต์เดียวกัน
+                ck(f"[{tool}] ไฟล์ไปถึงกล่องรับของเครื่องมือเลย เป็นภาพ 3 เท่า (กว้าง 1.5 เท่าของภาพบนจอ)",
+                   bool(got) and abs(got["width"] - width * 1.5) <= 2 and got["name"].endswith(".drawio.png"), str(got and (got["name"], got["width"], width)))
+            else:
+                ck(f"[{tool}] ไฟล์ไปถึงกล่องรับของเครื่องมือเลย ไม่ต้องเลือกไฟล์ใหม่ ตรงกับภาพบนจอทุกไบต์",
+                   bool(got) and got["sha"] == sha and got["name"].endswith(".drawio.png"), str(got and got["name"]))
             ck(f"[{tool}] รับแล้วของที่ฝากถูกลบทันที ทั้งใน IndexedDB และธง", pg.evaluate(PENDING) is None
                and pg.evaluate("() => sessionStorage.getItem('fk:handoff')") is None)
 

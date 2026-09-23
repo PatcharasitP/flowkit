@@ -8,6 +8,8 @@
 #
 # --selftest ตัวค้นของลับต้องเจอของลับที่แอบใส่ใน PNG และตัวตรวจเส้นต้องจับเส้นที่เสียบผิดด้านได้
 
+import datetime
+TODAY = datetime.date.today().isoformat()   # ชื่อไฟล์มีวันที่ในเครื่อง (แผน v3 เฟส 3 ข้อ 5)
 import sys, os, re, zlib, html, base64, struct, pathlib, traceback, urllib.parse
 from playwright.sync_api import sync_playwright
 
@@ -168,7 +170,7 @@ def main():
         ck("‼️ sessionStorage ไม่มีของลับ", "Call_webhook" in store and not leaks(store), str(leaks(store)))
         with pg.expect_download() as d:
             pg.click("#dl")
-        ck("ชื่อไฟล์ที่ดาวน์โหลดมาจากชื่อ flow", d.value.suggested_filename == "แจ้งเตือนสัญญาใกล้หมด.drawio.png", d.value.suggested_filename)
+        ck("ชื่อไฟล์ที่ดาวน์โหลดมาจากชื่อ flow", d.value.suggested_filename == f"แจ้งเตือนสัญญาใกล้หมด-PowerAutomate-{TODAY}.drawio.png", d.value.suggested_filename)
         ck("ไม่มีตัวเลือกย่อกลุ่มเมื่อ flow ไม่มีกรอบ", pg.is_hidden("#paview"))
         pg.focus("#src"); pg.keyboard.press("Control+z"); pg.wait_for_timeout(300)
         ck("กด Ctrl+Z ในช่องพิมพ์ ได้ข้อความก่อนวางคืน", "Call_webhook" not in pg.input_value("#src"))
@@ -190,7 +192,7 @@ def main():
         ck("ดูข้างในกรอบวน ได้ผังแยกเฉพาะของข้างใน", got == sorted(want) and len(got) == 2, str(got))
         with pg.expect_download() as d:
             pg.click("#dl")
-        ck("ดาวน์โหลดผังข้างในกรอบ ชื่อไฟล์เป็นชื่อกรอบ", d.value.suggested_filename == "วนทีละรายการ For each item.drawio.png", d.value.suggested_filename)
+        ck("ดาวน์โหลดผังข้างในกรอบ ชื่อไฟล์เป็นชื่อกรอบ", d.value.suggested_filename == f"วนทีละรายการ For each item-PowerAutomate-{TODAY}.drawio.png", d.value.suggested_filename)
         pg.select_option("#pa-sel", "all")
         ck("กลับมาดูทั้ง flow ได้", drawn(pg, boxes(pg, sample)) == sorted(boxes(pg, sample)))
 
