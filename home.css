@@ -440,6 +440,12 @@ a.pill,a.brand{text-decoration:none}
 .sites a:hover::after,.sites a:focus-visible::after{opacity:1; visibility:visible}
 :root[lang="en"] .sites a::after{content:attr(data-tip-en)}
 @media (prefers-reduced-motion: reduce){ .sites a::after{transition:none} }
+/* 3 sites bar 23/09/2026 (see index.html comment) */
+.sites a{opacity:1; color:rgba(255,255,255,.64)}
+.sites a.self,.sites a:hover,.sites a:focus-visible{color:#fff}
+.sites .ico-file{color:#8fa0ff} .sites .ico-flow{color:#b59dff} .sites .ico-learn{color:#ff8a7c}
+@media (max-width:640px){ .network{display:block} .sites a{padding-inline:12px} .sites a::after{display:none} }
+
 
 /* หน้า 404 ใช้ไฟล์นี้ร่วม */
 .notfound{max-width:var(--page-w); margin:0 auto; padding:clamp(40px,12vh,140px) var(--page-pad)}

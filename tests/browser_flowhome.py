@@ -221,7 +221,9 @@ def main():
         ck("ไม่เลื่อนข้าง", pg.evaluate(OVERFLOW) <= 0, f"{pg.evaluate(OVERFLOW)} px")
         ck("การ์ดสองคอลัมน์", pg.evaluate(TWO_COLS))
         ck("ประตูไป FileKit โผล่และชี้ /filekit/", pg.is_visible("a.door") and pg.get_attribute("a.door", "href") == "/filekit/")
-        ck("ภาพหัวเว็บกับแถบเว็บในเครือซ่อนบนจอแคบ", not pg.is_visible(".hero-demo") and not pg.is_visible("nav.network"))
+        # ‼️ แถบเว็บในเครือเหลือ 3 ลิงก์ (พี่ปอนด์ 23/09/2026) พอดีจอมือถือ จึงแสดงบนจอแคบด้วย ภาพหัวเว็บยังซ่อน
+        ck("ภาพหัวเว็บซ่อนบนจอแคบ แถบเว็บในเครือ 3 ลิงก์แสดงอยู่บรรทัดเดียว", not pg.is_visible(".hero-demo") and pg.is_visible("nav.network")
+           and len(set(round(r) for r in pg.eval_on_selector_all("nav.network a", "els => els.map(e => e.getBoundingClientRect().top)"))) == 1)
         wrap = pg.evaluate("""() => [...document.querySelectorAll('#tools a.pill .w')].filter((w) => w.getClientRects().length > 1).map((w) => w.textContent)""")
         ck("ชื่อการ์ดไม่ขาดกลางวลี (ตัดบรรทัดได้แค่ที่ช่องว่าง)", not wrap, str(wrap))
         ctx.close()

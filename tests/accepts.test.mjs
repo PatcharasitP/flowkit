@@ -116,7 +116,7 @@ function navOf(html, pageUrl) {
     return [name, new URL(href, pageUrl).href.replace("https://patcharasitp.github.io", ""), tip, tipEn];
   });
 }
-const SELF = new Set(["FileKit", "FlowKit"]);     // ตัวที่เป็นเว็บของตัวเองต่างกันได้ (ตัวหนา , ที่อยู่ของตัวเอง)
+const SELF = new Set(["FileKit", "FlowKit"]);     // ‼️ LearnKit ไม่อยู่ในนี้ ลิงก์ LearnKit ต้องชี้ที่เดียวกันทั้งสองเว็บ     // ตัวที่เป็นเว็บของตัวเองต่างกันได้ (ตัวหนา , ที่อยู่ของตัวเอง)
 function navDiff(a, b) {
   const out = [];
   if (a.map((x) => x[0]).join("|") !== b.map((x) => x[0]).join("|")) out.push(`รายชื่อไม่ตรง ${a.map((x) => x[0]).join(",")} กับ ${b.map((x) => x[0]).join(",")}`);
@@ -218,7 +218,9 @@ async function main() {
   for (const [p, url] of [["index.html", "https://patcharasitp.github.io/flowkit/"], ["draw/index.html", "https://patcharasitp.github.io/flowkit/draw/"]]) {
     const n = navOf(html[p], url);
     const d = navDiff(fknav, n);
-    ck(n.length >= 8 && !d.length, `${p} แถบเว็บในเครือ ${n.length} ลิงก์ ตรงกับ FileKit`, d.slice(0, 3).join("\n      "));
+    /* ‼️ พี่ปอนด์สั่ง 23/09/2026 เหลือ 3 เว็บ FileKit FlowKit LearnKit เปิดในแท็บเดิม */
+    ck(n.map((x) => x[0]).join() === "FileKit,FlowKit,LearnKit" && !d.length, `${p} แถบเว็บในเครือ 3 ลิงก์ FileKit FlowKit LearnKit ตรงกับ FileKit`, d.slice(0, 3).join("\n      "));
+    ck(!/target="_blank"/.test((html[p].match(/<nav class="network"[\s\S]*?<\/nav>/) || [""])[0]), `${p} แถบเว็บในเครือเปิดในแท็บเดิม`);
     ck(n.find((x) => x[0] === "FlowKit")?.[1] === "/flowkit/" && n.find((x) => x[0] === "FileKit")?.[1] === "/filekit/", `${p} FlowKit ชี้ /flowkit/ , FileKit ชี้ /filekit/`);
   }
 
@@ -270,10 +272,10 @@ function selftest() {
   ck(colorDiff(fkcss, bent, true).out.length >= 1, "สีตัวแปรเพี้ยนหนึ่งตัว จับได้");
   ck(colorDiff(fkcss, rd("home.css").replace(/--g-ppt:[^;]+;/, ""), true).out.some((x) => x.includes("ขาด --g-ppt")), "ตัวแปรสีหายหนึ่งตัว จับได้");
   const nav = navOf(idx, "https://patcharasitp.github.io/flowkit/");
-  ck(navDiff(nav, nav.filter((x) => x[0] !== "Excel")).length >= 1, "ลิงก์ในแถบเว็บในเครือหายหนึ่งตัว จับได้");
-  ck(navDiff(nav, nav.map((x) => x[0] === "Excel" ? [x[0], "/filekit/#/x", x[2], x[3]] : x)).length === 1, "ลิงก์ชี้ผิดที่ จับได้");
-  ck(navDiff(nav, nav.map((x) => x[0] === "Excel" ? [x[0], x[1], "ป้ายอื่น", x[3]] : x)).length === 1, "ป้ายตอนชี้ไม่ตรงกันสองเว็บ จับได้");
-  ck(navDiff(nav.map((x) => x[0] === "Excel" ? [x[0], x[1], "", ""] : x), nav).length >= 1, "ป้ายตอนชี้หายไป จับได้");
+  ck(navDiff(nav, nav.filter((x) => x[0] !== "LearnKit")).length >= 1, "ลิงก์ในแถบเว็บในเครือหายหนึ่งตัว จับได้");
+  ck(navDiff(nav, nav.map((x) => x[0] === "LearnKit" ? [x[0], "/filekit/#/x", x[2], x[3]] : x)).length === 1, "ลิงก์ชี้ผิดที่ จับได้");
+  ck(navDiff(nav, nav.map((x) => x[0] === "LearnKit" ? [x[0], x[1], "ป้ายอื่น", x[3]] : x)).length === 1, "ป้ายตอนชี้ไม่ตรงกันสองเว็บ จับได้");
+  ck(navDiff(nav.map((x) => x[0] === "LearnKit" ? [x[0], x[1], "", ""] : x), nav).length >= 1, "ป้ายตอนชี้หายไป จับได้");
   ck(thaiNoEn('<body><p>ไทยไม่มีคำแปล</p><p data-en="x">ไทย</p><h1 data-en-html="a<em>b</em>">ก<em>ข</em></h1>').length === 1, "ข้อความไทยไม่มีคำแปล จับได้ (ลูกของ data-en-html ไม่นับ)");
   ck(Object.keys(vars("@media (x){\n:root{--a:1;}\n}", "@media (x){ :root{")).length === 1, "หาบล็อกสีเจอแม้จัดบรรทัดต่างกัน");
   ck(styleAttrs('<div style="--ac:red">').length === 1 && styleInJs('el.setAttribute("style", x)').length === 1
