@@ -8,9 +8,11 @@ import { parseSteps } from "./parse-steps.js";
 import { parseOrg } from "./parse-org.js";
 import { parseSystem } from "./parse-system.js";
 import { parseTimeline } from "./parse-timeline.js";
+import { parseTable } from "./parse-table.js";
+import { parseMindmap } from "./parse-mindmap.js";
 
 /* ผังลู่ (ใครทำอะไร , แผน v3 D3) ใช้ตัวอ่านผังขั้นตอนตัวเดียวกันทุกกติกา ต่างกันแค่ตัววาด (grid.js แทน Mermaid) */
-const PARSERS = { steps: parseSteps, lane: parseSteps, org: parseOrg, system: parseSystem, timeline: parseTimeline };
+const PARSERS = { steps: parseSteps, lane: parseSteps, org: parseOrg, system: parseSystem, timeline: parseTimeline, table: parseTable, mindmap: parseMindmap };
 /** ผังใหญ่เกินเท่านี้ใส่สไลด์เดียวอ่านยาก (D6 , หลุม H3) */
 export const BIG_DIAGRAM = 25;
 
@@ -35,7 +37,10 @@ export function parseText(text, uiKind = "steps") {
     const kind = head.kind || uiKind;
     const model = PARSERS[kind](lines, warnings);
     model.kind = kind;
-    attachTips(model, lines);
+    if (kind === "table") {
+      /* ช่องตารางไม่มีป้ายตอนชี้ บอกตรง ๆ ไม่ใส่ผิดช่องเงียบ ๆ */
+      for (const l of lines) if (l.tip) model.warnings.push({ line: l.no, text: tr("ตารางยังไม่มีป้ายตอนชี้ (( )) ข้อความในวงเล็บคู่ถูกข้ามไป", "Tables have no hover notes yet, the (( )) text was left out") });
+    } else attachTips(model, lines);
     if (head.title) model.title = head.title;
     if (head.dir) model.dir = head.dir;
     if (model.nodes.length > BIG_DIAGRAM) {

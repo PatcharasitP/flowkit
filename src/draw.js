@@ -26,7 +26,7 @@ const editBtn = $("#edit"), room = $("#room"), fileIn = $("#filein"), dlSvg = $(
 const sendBtns = [...document.querySelectorAll("[data-send]")];
 /** ปุ่มที่ใช้ได้เมื่อมีผังพร้อม (ดาวน์โหลด , แบบอื่น , ส่งต่อ) เปิดปิดพร้อมกันเสมอ */
 const setReady = (on) => { for (const b of [dl, dlSvg, dlXml, $("#dlppt"), ...sendBtns]) b.disabled = !on; };
-const KINDS = ["steps", "lane", "org", "system", "timeline", "pa"];        // pa = flow ของ Power Automate (ช่องพิมพ์รับ JSON)
+const KINDS = ["steps", "lane", "org", "system", "timeline", "table", "mindmap", "pa"];        // pa = flow ของ Power Automate (ช่องพิมพ์รับ JSON)
 const SAMPLE = SAMPLES[IS_EN ? "en" : "th"];
 const DEBOUNCE_MS = 400;                          // แผนเฟส 2 ข้อ 5
 const isPhone = () => matchMedia("(max-width:760px)").matches;
@@ -79,6 +79,10 @@ const HINTS = {
              "One line is one arrow, write from -> to: what moves, use --> for dashed and <-> for both ways"),
   timeline: tr("หนึ่งบรรทัดคือหนึ่งช่วง เขียนว่า ช่วงเวลา: งาน , ย่อหน้าเพื่อเพิ่มงานในช่วงเดียวกัน",
                "One line is one period, write period: task, indent to add more tasks to the same period"),
+  table: tr("บรรทัดแรกบอกแบบตาราง  งาน \\ ตำแหน่ง: ก, ข = ตารางอำนาจ , แกนนอน: ก | ข = สี่ช่อง , ช่วง: ก, ข = เส้นทางลูกค้า , ช่องคั่นด้วย , ช่องว่างใส่ -",
+             "The first line picks the table  task \\ role: A, B = authority table , x: A | B = four boxes , stages: A, B = customer journey , separate cells with , and use - for empty"),
+  mindmap: tr("บรรทัดแรกคือหัวข้อกลาง ย่อหน้าเข้าไปคือกิ่ง ย่อลึกลงอีกคือกิ่งย่อย , กิ่งหลักแต่ละกิ่งได้สีของตัวเอง",
+               "The first line is the centre topic, indent a line to make a branch, indent more for sub branches, each main branch gets its own colour"),
   /* ‼️ เลี่ยงคำว่า แอ็กชัน ในบรรทัดนี้: Chrome ตัดคำไทยทับศัพท์คำนี้กลางคำเป็น แอ็ กับ กชัน บนจอมือถือ (เห็นเองกับตา 22/09/2026) */
   pa: tr("วาง flow ของ Power Automate ตรงนี้ ได้ทั้งก้อนที่คัดลอกจากกล่อง Scope ที่ครอบทั้ง flow และไฟล์ definition.json , ค่าที่ตั้งไว้ในแต่ละขั้นถูกตัดทิ้งตั้งแต่ตอนวาง ชื่อกล่องมาจาก description แก้ตรงนี้ได้เลย",
          "Paste a Power Automate flow here, a block copied from a container action (like a Scope around the whole flow) or a definition.json file. Action values are removed as you paste, box names come from the description, edit them right here"),
@@ -89,7 +93,7 @@ const EMPTY_HINT = tr("สี่เหลี่ยมคือขั้นที
 const hintFor = (k, empty) => (empty && (k === "steps" || k === "lane") ? EMPTY_HINT : HINTS[k]);
 const DRAFT_KEY = "fk-flow";
 let kind = "steps";
-const texts = { steps: null, lane: null, org: null, system: null, timeline: null, pa: null };   // null = ยังเป็นตัวอย่าง
+const texts = { steps: null, lane: null, org: null, system: null, timeline: null, table: null, mindmap: null, pa: null };   // null = ยังเป็นตัวอย่าง
 try {
   const d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
   if (d && KINDS.includes(d.kind)) kind = d.kind;
@@ -314,7 +318,7 @@ function retry() { engine.retry(); lastMmd = ""; update(); }
 /** ชื่อไฟล์จาก ชื่อ: หรือกล่องแรก (แผนเฟส 3 ข้อ 1) + ชนิดผังกับวันที่ (แผน v3 เฟส 3 ข้อ 5) เช่น ขออนุมัติ-ลู่-2026-09-23.drawio.png
  *  ทำหลายรุ่นในวันเดียวกันแล้วแยกออกว่าไฟล์ไหนเป็นผังแบบไหน วันที่เป็นเวลาในเครื่องผู้ใช้ */
 const KIND_SHORT = { steps: tr("ขั้นตอน", "process"), lane: tr("ลู่", "lanes"), org: tr("องค์กร", "org"), system: tr("ระบบ", "systems"),
-  timeline: tr("ไทม์ไลน์", "timeline"), pa: "PowerAutomate" };
+  timeline: tr("ไทม์ไลน์", "timeline"), table: tr("ตาราง", "table"), mindmap: tr("ความคิด", "mindmap"), pa: "PowerAutomate" };
 const today = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 function fileName(model) {
   const raw = model.title || (model.nodes[0] ? model.nodes[0].text.split(" | ")[0] : "") || "FlowKit";
@@ -322,7 +326,7 @@ function fileName(model) {
   return `${safe || "FlowKit"}-${KIND_SHORT[model.kind] || model.kind}-${today()}.drawio.png`;
 }
 const KIND_NAME = { steps: tr("ผังขั้นตอน", "Process diagram"), lane: tr("ผังใครทำอะไร", "Who does what diagram"), org: tr("ผังองค์กร", "Org chart"),
-  system: tr("ผังระบบ", "Systems diagram"), timeline: tr("ไทม์ไลน์", "Timeline"), pa: tr("ผัง Power Automate", "Power Automate flow") };
+  system: tr("ผังระบบ", "Systems diagram"), timeline: tr("ไทม์ไลน์", "Timeline"), table: tr("ตาราง", "Table"), mindmap: tr("แผนผังความคิด", "Mind map"), pa: tr("ผัง Power Automate", "Power Automate flow") };
 
 /** เอาภาพผัง (PNG ฝัง XML) ขึ้นจอ และเป็นไฟล์ที่ปุ่มดาวน์โหลดจะให้ */
 function show(png, xml, name, alt, scale = 2) {
@@ -541,10 +545,12 @@ function update() {
   /* ผังลู่ (แผน v3 เฟส 2): โหลด grid.js ตอนเลือกชนิดนี้ครั้งแรกเท่านั้น (งบความเร็ว D5 เหมือน parse-pa.js)
      คำนวณตำแหน่งก่อนแสดงข้อความเตือน เพราะคำเตือนของลู่ (ลู่ว่าง , กว้างเกินสไลด์) มาจากตัวคำนวณ */
   let grid = null;
-  if (r.model && r.model.kind === "lane") {
+  if (r.model && (r.model.kind === "lane" || r.model.kind === "table")) {
     if (!gridMod) { loadGrid().then(update, () => {}); return; }
-    grid = gridMod.toGridXml(r.model, { measure: measureText, look: "h" });
-    r.model.warnings.push(...grid.warnings);
+    /* ✋W7 (พี่ปอนด์เคาะ 23/09/2026) ลู่แนวนอนหัวซ้าย , ตาราง = โหมดตารางล้วนของเครื่องยนต์เดียวกัน (เฟส 5) */
+    grid = r.model.kind === "table" ? gridMod.toTableXml(r.model, { measure: measureText })
+      : gridMod.toGridXml(r.model, { measure: measureText, look: "h" });
+    if (grid.warnings) r.model.warnings.push(...grid.warnings);
   }
   paintHighlight(r.error ? r.error.line : 0);
   showMessages(r);

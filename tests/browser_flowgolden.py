@@ -180,8 +180,9 @@ def main():
                 continue
             set_text(pg, text)
             lane = exp["kind"] == "lane"
-            png, xml = render(pg, exp["boxes"] + exp["groups"], lane=lane)
-            texts = seen(xml, lane)
+            blanks = exp["kind"] in ("lane", "table")        # กรอบลู่ กับช่องตารางที่ใส่ - มีกล่องไม่มีข้อความโดยตั้งใจ
+            png, xml = render(pg, exp["boxes"] + exp["groups"], lane=blanks)
+            texts = seen(xml, blanks)
             want = sorted(exp["boxes"] + exp["groups"])
             ck(f"[{name}] {exp['kind']} กล่อง {len(exp['boxes'])} กลุ่ม {len(exp['groups'])} ข้อความตรงทุกกล่อง", texts == want,
                f"ขาด {sorted(set(want) - set(texts))[:4]} เกิน {sorted(set(texts) - set(want))[:4]}")

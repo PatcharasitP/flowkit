@@ -68,6 +68,34 @@ const RULES = {
   },
 };
 
+/* ตาราง (แผน v3 เฟส 5) เลือกแบบเดียวจาก 3 แบบตามงาน */
+RULES.th.table = [
+  "เลือกแบบเดียวที่เหมาะกับงาน: ตารางอำนาจ (ใครทำอะไรในแต่ละงาน) , สี่ช่อง (จัดของลงสองแกน) , เส้นทางลูกค้า (ช่วงเวลาเรียงกัน)",
+  "ตารางอำนาจ: บรรทัดแรกเขียน งาน \\ ตำแหน่ง: ตำแหน่ง1, ตำแหน่ง2 แล้วบรรทัดละงาน ชื่องาน: ค่า, ค่า ใช้คำ ทำ ตรวจ อนุมัติ รับทราบ ช่องว่างใส่ -",
+  "สี่ช่อง: แกนนอน: ค่า1 | ค่า2 แล้ว แกนตั้ง: ค่า1 | ค่า2 แล้วบรรทัดละช่อง ค่าแกนนอน+ค่าแกนตั้ง: รายการ, รายการ",
+  "เส้นทางลูกค้า: บรรทัดแรก ช่วง: ช่วง1, ช่วง2 แล้วบรรทัดละมิติ ชื่อมิติ: ค่า, ค่า จำนวนค่าเท่ากับจำนวนช่วง",
+  "คั่นช่องด้วย , ทุกบรรทัดชิดซ้าย ไม่ย่อหน้า",
+];
+RULES.en.table = [
+  "Pick one kind that fits: authority table (who does what for each task) , four boxes (sort items on two axes) , customer journey (stages in order)",
+  "Authority table: first line Task \\ Role: role1, role2 then one task per line as task: value, value using do, review, approve, informed and - for empty",
+  "Four boxes: x: value1 | value2 then y: value1 | value2 then one box per line as xvalue+yvalue: item, item",
+  "Customer journey: first line stages: stage1, stage2 then one row per line as row name: value, value with one value per stage",
+  "Separate cells with , and keep every line flush left",
+];
+
+/* แผนผังความคิด (แผน v3 เฟส 6) */
+RULES.th.mindmap = [
+  "บรรทัดแรกชิดซ้ายคือหัวข้อกลาง มีได้บรรทัดเดียว",
+  "กิ่งหลักย่อหน้า 2 วรรค กิ่งย่อยย่อหน้าลึกลงอีกชั้นละ 2 วรรค",
+  "ข้อความแต่ละกิ่งสั้น ๆ ไม่เกิน 25 ตัวอักษร กิ่งหลัก 3 ถึง 6 กิ่ง",
+];
+RULES.en.mindmap = [
+  "The first line, flush left, is the centre topic, only one",
+  "Main branches are indented 2 spaces, sub branches 2 more spaces per level",
+  "Keep each branch short, under 25 characters, with 3 to 6 main branches",
+];
+
 /* ผังลู่ใช้กติกาผังขั้นตอนทุกข้อ ต่างกันที่ข้อ [ฝ่าย] ซึ่งกลายเป็นหัวใจของผัง */
 for (const [lang, rule] of [["th", "ขั้นแรกของทุกฝ่ายต้องขึ้นต้นด้วย [ชื่อฝ่าย] เช่น [บัญชี] ตรวจเอกสาร ขั้นถัดไปที่ฝ่ายเดิมทำไม่ต้องเขียนซ้ำ ใช้ชื่อฝ่ายเดิมทุกครั้ง"],
   ["en", "The first step of every team starts with [Team name], like [Finance] Check the papers. Later steps by the same team need no name. Spell each team the same way every time"]]) {
@@ -75,8 +103,8 @@ for (const [lang, rule] of [["th", "ขั้นแรกของทุกฝ�
 }
 
 const KIND_WORD = {
-  th: { steps: "ขั้นตอน", lane: "ใครทำอะไร (แยกลู่ตามฝ่าย)", org: "องค์กร", system: "ระบบ", timeline: "ไทม์ไลน์" },
-  en: { steps: "process", lane: "swimlane (who does what)", org: "org chart", system: "systems", timeline: "timeline" },
+  th: { steps: "ขั้นตอน", lane: "ใครทำอะไร (แยกลู่ตามฝ่าย)", org: "องค์กร", system: "ระบบ", timeline: "ไทม์ไลน์", table: "ตาราง", mindmap: "ความคิด (mind map)" },
+  en: { steps: "process", lane: "swimlane (who does what)", org: "org chart", system: "systems", timeline: "timeline", table: "table", mindmap: "mind map" },
 };
 
 /** ตัวอย่าง 2 ใบของชนิดผังนั้น (ตัวอย่างในช่องพิมพ์ + เทมเพลตชนิดเดียวกัน) */

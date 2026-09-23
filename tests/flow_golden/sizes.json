@@ -62,5 +62,25 @@
  "18-lane-parallel": [
   2164,
   836
+ ],
+ "19-table-authority": [
+  1254,
+  572
+ ],
+ "20-table-priority": [
+  968,
+  596
+ ],
+ "21-table-journey": [
+  1150,
+  572
+ ],
+ "22-mindmap": [
+  1446,
+  892
+ ],
+ "23-decision-tree": [
+  1606,
+  680
  ]
 }

@@ -154,6 +154,21 @@ console.log("\n━━ ป้ายตอนชี้ (แผน v3 เฟส 4) 
   ck(D.applyDefaults(xmlOf("02-renewal"), m, OFF).includes('tooltip="'), "ปิดค่าตั้งต้นทุกข้อ ป้ายที่ผู้ใช้พิมพ์ยังอยู่ (ไม่ใช่ค่าตั้งต้น)");
 }
 
+console.log("\n━━ หน้าตาแผนผังความคิด (แผน v3 เฟส 6) ━━");
+{
+  /* XML จริงจากตัวฝัง (.claude/evidence/flowkit-v3-2026-09-23/phase6/mm-entity.xml) ราก 1 กิ่งหลัก 3 (กิ่งแรกมีลูก 1) */
+  const x = xmlOf("mindmap");
+  const out = D.mindmapLook(x);
+  ck(!/mermaidId="[ne]:[^"]*mm\d/.test(out) && /mermaidId="n:n1"/.test(out) && /mermaidId="e:n1-&gt;n2#0"/.test(out), "id mm0 mm1 ของ draw.io กลายเป็น n1 n2 ของเรา (ป้ายตอนชี้ใช้ได้)");
+  const vs = vertices(out), fill = (id) => (vs.find((v) => v.mid === "n:" + id).style.match(/fillColor=([^;]*)/) || [])[1];
+  ck(fill("n1") === "default" && /fontStyle=1/.test(vs.find((v) => v.mid === "n:n1").style), "หัวข้อกลางพื้นขาว ตัวหนา");
+  ck(fill("n2") === fill("n3") && fill("n2") !== fill("n4") && fill("n4") !== fill("n5"), "กิ่งย่อยใช้สีของกิ่งหลัก กิ่งหลักแต่ละกิ่งคนละสี", ["n2", "n3", "n4", "n5"].map(fill).join());
+  ck(/#0000EC/i.test(x) && !/#0000EC|#FFFF78|#D7FF86|#C286FF/i.test(out) && !/strokeWidth=11/.test(out), "สีจัดกับเส้นหนา 11 ของ Mermaid หายทั้งสไตล์ที่ใช้วาดและ mermaidBaseStyle");
+  ck(edges(out).every((e) => /strokeWidth=2(;|$)/.test(e.style)), "เส้นบาง 2");
+  const mm = parseText("หัวข้อ\n  ก\n    ก1\n  ข\n  ค\n  ง", "mindmap").model;
+  ck(D.applyDefaults(x, mm, OFF) !== x && /mermaidId="n:n1"/.test(D.applyDefaults(x, mm, OFF)), "ปิดค่าตั้งต้นทุกข้อ หน้าตาแผนผังความคิดยังใช้ (ไม่ใช่สวิตช์)");
+}
+
 console.log("\n━━ ท่อรวมกับของพัง ━━");
 {
   const m = model("02-renewal");

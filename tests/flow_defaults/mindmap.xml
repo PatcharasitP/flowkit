@@ -1,0 +1,55 @@
+<mxfile host="embed.diagrams.net">
+  <diagram id="meTgnFhFCOOstZfgGDXj" name="Page-1">
+    <mxGraphModel dx="1376" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidId="e:mm0-&gt;mm1#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=none;strokeWidth=11;strokeColor=light-dark(#FFFF78,#cccccc);linecap=square;" mermaidBaseValue="" id="7">
+          <mxCell edge="1" parent="1" source="2" style="curved=1;startArrow=none;endArrow=none;strokeWidth=11;strokeColor=light-dark(#FFFF78,#cccccc);linecap=square;" target="3">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:mm1-&gt;mm2#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=none;strokeWidth=5;strokeColor=light-dark(#FFFF78,#cccccc);linecap=square;" mermaidBaseValue="" id="8">
+          <mxCell edge="1" parent="1" source="3" style="curved=1;startArrow=none;endArrow=none;strokeWidth=5;strokeColor=light-dark(#FFFF78,#cccccc);linecap=square;" target="4">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:mm0-&gt;mm3#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=none;strokeWidth=11;strokeColor=light-dark(#D7FF86,#cccccc);linecap=square;" mermaidBaseValue="" id="9">
+          <mxCell edge="1" parent="1" source="2" style="curved=1;startArrow=none;endArrow=none;strokeWidth=11;strokeColor=light-dark(#D7FF86,#cccccc);linecap=square;" target="5">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:mm0-&gt;mm4#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=none;strokeWidth=11;strokeColor=light-dark(#C286FF,#cccccc);linecap=square;" mermaidBaseValue="" id="10">
+          <mxCell edge="1" parent="1" source="2" style="curved=1;startArrow=none;endArrow=none;strokeWidth=11;strokeColor=light-dark(#C286FF,#cccccc);linecap=square;" target="6">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;div style=&quot;line-height:1.5;&quot;&gt;งานประจำปี&lt;/div&gt;" mermaidId="n:mm0" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#0000EC,#1f2020);strokeColor=light-dark(#0000EC,#cccccc);fontColor=light-dark(#FFFFFF,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;div style=&quot;line-height:1.5;&quot;&gt;งานประจำปี&lt;/div&gt;" id="2">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#0000EC,#1f2020);strokeColor=light-dark(#0000EC,#cccccc);fontColor=light-dark(#FFFFFF,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="44" width="117" x="188" y="214" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;div style=&quot;line-height:1.5;&quot;&gt;การเงิน (ภาษี)&lt;/div&gt;" mermaidId="n:mm1" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#FFFF78,#1f2020);strokeColor=light-dark(#FFFF78,#cccccc);fontColor=light-dark(#000000,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;div style=&quot;line-height:1.5;&quot;&gt;การเงิน (ภาษี)&lt;/div&gt;" id="3">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#FFFF78,#1f2020);strokeColor=light-dark(#FFFF78,#cccccc);fontColor=light-dark(#000000,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="44" width="185" x="160" y="117" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;div style=&quot;line-height:1.5;&quot;&gt;งบ [2569]&lt;/div&gt;" mermaidId="n:mm2" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#FFFF78,#1f2020);strokeColor=light-dark(#FFFF78,#cccccc);fontColor=light-dark(#000000,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;div style=&quot;line-height:1.5;&quot;&gt;งบ [2569]&lt;/div&gt;" id="4">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#FFFF78,#1f2020);strokeColor=light-dark(#FFFF78,#cccccc);fontColor=light-dark(#000000,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="44" width="160" x="178" y="20" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;div style=&quot;line-height:1.5;&quot;&gt;คน &amp; ทีม&lt;/div&gt;" mermaidId="n:mm3" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#D7FF86,#1f2020);strokeColor=light-dark(#D7FF86,#cccccc);fontColor=light-dark(#000000,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;div style=&quot;line-height:1.5;&quot;&gt;คน &amp; ทีม&lt;/div&gt;" id="5">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#D7FF86,#1f2020);strokeColor=light-dark(#D7FF86,#cccccc);fontColor=light-dark(#000000,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="44" width="134" x="313" y="282" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;div style=&quot;line-height:1.5;&quot;&gt;ระบบ {ERP}&lt;/div&gt;" mermaidId="n:mm4" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#C286FF,#1f2020);strokeColor=light-dark(#C286FF,#cccccc);fontColor=light-dark(#FFFFFF,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;div style=&quot;line-height:1.5;&quot;&gt;ระบบ {ERP}&lt;/div&gt;" id="6">
+          <mxCell parent="1" style="html=1;whiteSpace=wrap;strokeWidth=1;treeMoving=1;fillColor=light-dark(#C286FF,#1f2020);strokeColor=light-dark(#C286FF,#cccccc);fontColor=light-dark(#FFFFFF,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="44" width="191" x="20" y="283" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

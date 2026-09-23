@@ -68,6 +68,7 @@ const ALIGN = 6;             // จุดกลางที่ Mermaid วาง
 const median = (a) => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 export function uniformWidth(xml, kind) {
   xml = String(xml);
+  if (kind === "mindmap") return xml;             // วางเป็นวงรอบหัวข้อกลาง แนวตั้งตรงกันเป็นเรื่องบังเอิญ ไม่ใช่แถว
   const boxes = [];
   for (const m of xml.matchAll(BLOCK)) {
     const b = m[0];
@@ -184,6 +185,31 @@ export function addTips(xml, model) {
   });
 }
 
+/** หน้าตาแผนผังความคิด (แผน v3 เฟส 6) ไม่ใช่สวิตช์ เป็นหน้าตาเดียวของชนิดนี้
+ *  ‼️ สีตั้งต้นของ Mermaid mindmap จัดมาก (ราก #0000EC กิ่ง #FFFF78 เส้นหนา 11 เห็นจากภาพ phase0/mindmap.png) ขัดรสนิยม โปร่ง บาง จาง
+ *  กิ่งหลักแต่ละกิ่งได้สีจางคนละสี ลูกหลานใช้สีเดียวกับกิ่ง เส้นบาง 2 หัวข้อกลางกรอบเทาตัวหนา
+ *  ‼️ draw.io ตั้ง id เป็น mm0 mm1 ... ตามลำดับที่เขียน (= ลำดับกล่องในโมเดล) เปลี่ยนกลับเป็น n1 n2 ของเรา ป้ายตอนชี้จึงใช้ได้ */
+const MM_FILL = ["#eef2fb", "#eef7f1", "#fbf3e8", "#f6eefa", "#eaf6f7", "#fbeeee", "#f3f4e6"];
+const MM_LINE = ["#aebde6", "#a9d3b6", "#e6c89e", "#d3b7e3", "#a6d6da", "#e9b3b3", "#cfd3a4"];
+export function mindmapLook(xml) {
+  xml = String(xml).replace(/mermaidId="([ne]):([^"]*)"/g, (_, t, id) => `mermaidId="${t}:${id.replace(/mm(\d+)/g, (__, k) => "n" + (Number(k) + 1))}"`);
+  const parent = new Map();
+  for (const m of xml.matchAll(/mermaidId="e:(n\d+)-&gt;(n\d+)#\d+"/g)) parent.set(m[2], m[1]);
+  const branch = (id) => { let c = id; while (parent.has(c) && parent.get(c) !== "n1") c = parent.get(c); return c; };
+  const order = [...new Set([...parent.keys()].filter((k) => parent.get(k) === "n1"))].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
+  const col = (id) => Math.max(0, order.indexOf(branch(id))) % MM_FILL.length;
+  return xml.replace(BLOCK, (b) => {
+    const e = isEdge(b) && edgeIds(b);
+    if (e) return restyle(b, (st) => setKeys(st, { strokeWidth: "2", strokeColor: MM_LINE[col(e.to)] }));
+    const m = (attr(b, "mermaidId") || "").match(/^n:(n\d+)$/);
+    if (!m) return b;
+    const root = m[1] === "n1";
+    return restyle(b, (st) => setKeys(st, root
+      ? { fillColor: "default", strokeColor: "#8a8f98", fontColor: "#14161c", fontStyle: "1", strokeWidth: "1.5" }
+      : { fillColor: MM_FILL[col(m[1])], strokeColor: MM_LINE[col(m[1])], fontColor: "#14161c", strokeWidth: "1" }));
+  });
+}
+
 /** ท่อรวม on = { jumps, floating, uniform, semantic, loops } ข้อที่ไม่ได้ส่งมาถือว่าเปิด
  *  ‼️ พังข้อไหน คืน xml ก่อนข้อนั้น ผังต้องวาดได้เสมอแม้ค่าตั้งต้นพัง */
 export function applyDefaults(xml, model, on = {}) {
@@ -196,6 +222,7 @@ export function applyDefaults(xml, model, on = {}) {
     ["jumps", (x) => lineJumps(x)],
   ];
   let out = String(xml);
+  if (kind === "mindmap") { try { out = mindmapLook(out); } catch { /* สีตั้งต้นของเขา ผังยังขึ้น */ } }
   try { out = addTips(out, model); } catch { /* ข้ามป้าย ผังยังขึ้น */ }
   for (const [k, fn] of steps) {
     if (on[k] === false) continue;

@@ -113,13 +113,14 @@ def wait_ready(pg, before_src=None, ms=READY_MS):
 def img_src(pg): return pg.evaluate("() => document.querySelector('#png').currentSrc")
 
 
-def drawn(pg, want, ms=READY_MS):
+def drawn(pg, want, ms=READY_MS, blanks=False):
     """รอจนผังบนจอมีกล่องตรงกับที่คาด (เรียงแล้วเทียบ) คืนรายการข้อความที่เห็นรอบสุดท้าย
     ‼️ ไม่รอ "ภาพใบใหม่" เฉย ๆ เพราะระหว่างพิมพ์อาจวาดรอบกลางทางไปก่อนแล้ว ถามผลสุดท้ายตรง ๆ แทน"""
     want = sorted(want); last = None; waited = 0
     while waited <= ms:
         if state(pg) == "ready" and not pg.evaluate("() => document.querySelector('#live').hasAttribute('data-busy')"):
-            last = sorted(t for t, _ in cells(drawio_xml(preview_png(pg)) or ""))
+            # blanks = ผังลู่กับตาราง มีกล่องไม่มีข้อความโดยตั้งใจ (กรอบลู่ , ช่องที่ใส่ -) ไม่นับ
+            last = sorted(t for t, _ in cells(drawio_xml(preview_png(pg)) or "") if t or not blanks)
             if last == want: return last
         pg.wait_for_timeout(500); waited += 500
     return last

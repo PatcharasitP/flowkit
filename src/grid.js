@@ -211,3 +211,52 @@ export function toGridXml(model, { measure, look = "h" } = {}) {
   out.push("</root></mxGraphModel>");
   return { xml: out.join(""), lanes: laneKeys.length, cols: nCols, warnings };
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * ผังตาราง 3 แบบ (แผน v3 เฟส 5) โหมด "ตารางล้วน" ไม่มีเส้นเชื่อม ช่องเป็นสี่เหลี่ยมชิดกันแบบตาราง
+ * ✋W9 (พี่ปอนด์เคาะ 23/09/2026 ตามที่ฟ้าแนะนำ): สีจางตามคำเฉพาะตารางอำนาจ (ทำ ตรวจ อนุมัติ ต่างกันเห็นทันที) ที่เหลือขาวดำ
+ * ───────────────────────────────────────────────────────────────────────────── */
+/** คำในช่องของตารางอำนาจ → สีจาง (รองรับ RACI ด้วย) คำอื่นไม่มีสี */
+const ROLE_TINT = [
+  [/^(ทำ|ผู้ทำ|จัดทำ|r|do|does|responsible)$/i, "#eef2fb"],
+  [/^(ตรวจ|ตรวจสอบ|ให้ความเห็น|เสนอ|c|review|reviews|consulted|check|checks)$/i, "#fbf3e8"],
+  [/^(อนุมัติ|ผู้อนุมัติ|ลงนาม|a|approve|approves|accountable|sign|signs)$/i, "#eef7f1"],
+  [/^(รับทราบ|แจ้ง|i|informed|fyi)$/i, "#f6eefa"],
+];
+export const roleTint = (t) => (ROLE_TINT.find(([re]) => re.test(String(t).trim())) || [null, null])[1];
+
+/**
+ * @param {object} model FlowModel ที่มี table (parse-table.js)
+ * @param {{ measure: (text: string, px: number) => number }} opts
+ * @returns {{ xml: string, rows: number, cols: number }}
+ */
+export function toTableXml(model, { measure }) {
+  const t = model.table, quad = t.variant === "quadrant";
+  const grid = [[t.corner, ...t.cols], ...t.rows.map((r) => [r.label, ...r.cells])];
+  const lines = (s) => String(s === "-" ? "" : s).split(" | ");
+  const MIN_W = quad ? 170 : 96, MAX_W = quad ? 240 : 220, MIN_H = quad ? 110 : 44;
+  const nC = grid[0].length;
+  const colW = Array.from({ length: nC }, (_, c) => Math.min(MAX_W, Math.max(c === 0 && quad ? 110 : MIN_W,
+    Math.ceil(Math.max(...grid.map((row) => Math.max(...lines(row[c]).map((l) => measure(l, PX))))) + 2 * PAD))));
+  const rowH = grid.map((row, r) => Math.max(r === 0 ? 44 : MIN_H, Math.max(...row.map((v, c) =>
+    lines(v).reduce((a, l) => a + Math.max(1, Math.ceil(measure(l, PX) * 1.08 / (colW[c] - 2 * PAD))), 0) * LINE + 20))));
+  const r2 = (v) => Math.round(v * 100) / 100;
+  const out = ['<mxGraphModel dx="0" dy="0" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" math="0" shadow="0"><root><mxCell id="0"/><mxCell id="1" parent="0"/>'];
+  let y = 0;
+  grid.forEach((row, r) => {
+    let x = 0;
+    row.forEach((v, c) => {
+      const head = r === 0 || c === 0;
+      const tint = head ? (r === 0 && c === 0 && !v ? "none" : "light-dark(#f4f3f0,#23262d)")
+        : t.variant === "authority" ? (roleTint(v) || "default") : "default";
+      const st = `rounded=0;html=1;whiteSpace=wrap;fillColor=${tint};strokeColor=${LANE_LINE};fontColor=${INK};fontSize=${PX};${head ? "fontStyle=1;" : ""}`
+        + `${quad && !head ? "verticalAlign=top;align=left;spacingLeft=10;spacingTop=8;" : ""}${FONT};`;
+      const val = v === "-" ? "" : label(v);
+      out.push(`<mxCell id="c${r}_${c}" value="${esc(val)}" style="${st}" vertex="1" parent="1"><mxGeometry x="${r2(x)}" y="${r2(y)}" width="${colW[c]}" height="${rowH[r]}" as="geometry"/></mxCell>`);
+      x += colW[c];
+    });
+    y += rowH[r];
+  });
+  out.push("</root></mxGraphModel>");
+  return { xml: out.join(""), rows: grid.length, cols: nC };
+}

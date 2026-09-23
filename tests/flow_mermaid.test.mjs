@@ -17,6 +17,7 @@ const ck = (ok, msg, detail = "") => {
   if (ok) { pass++; console.log("  ✅ " + msg); }
   else { fail.push(msg); console.log("  ❌ " + msg + (detail ? "\n      " + detail : "")); }
 };
+const mm_ = (text, kind = "steps") => { const r = parseText(text, kind); if (r.error) throw new Error(r.error.message); return toMermaid(r.model); };
 const mm = (text, kind = "steps") => { const r = parseText(text, kind); if (r.error) throw new Error(r.error.message); return toMermaid(r.model); };
 
 console.log("\n━━ escape (แผน 3.6 และหลุม H2) ━━");
@@ -194,6 +195,22 @@ console.log("\n━━ ผังองค์กรเส้นหักฉาก�
   ck(right && toMermaid(right).startsWith("flowchart LR") && edgeElbow(right) === "h", "สั่ง ทิศ: ซ้ายไปขวา เองทั้งที่ใบน้อย เส้นหักตามทิศที่สั่ง", right && toMermaid(right).split("\n")[0]);
   ck(["steps", "system", "timeline"].every((k) => edgeElbow(parseText("ก -> ข: ส่ง\nค", k).model || { kind: k }) === null),
     "ผังขั้นตอน ระบบ ไทม์ไลน์ ไม่โดนเส้นหักฉาก (คงเส้นโค้งเดิม)");
+}
+
+console.log("\n━━ แผนผังความคิด กับต้นไม้ตัดสินใจ (แผน v3 เฟส 6) ━━");
+{
+  const mm = mm_("ผัง: ความคิด\nงบ (2569)\n  การเงิน (ภาษี)\n    [ด่วน] {ERP} & \"ค่า\"\n  คน\n    ภาษี\n  เงิน\n    ภาษี");
+  ck(mm.startsWith("mindmap\n  n1(\"งบ #40;2569#41;\")") && mm.includes('    n2["การเงิน #40;ภาษี#41;"]') && mm.includes("#91;ด่วน#93; #123;ERP#125; #amp; #quot;ค่า#quot;"),
+    "‼️ วงเล็บทุกแบบหนีเป็น #40; (mindmap อ่าน ( ) เป็นรูปทรงแม้อยู่ในคำพูด ยิงจริงแล้วข้อความหาย)", mm);
+  ck((mm.match(/\["ภาษี"\]/g) || []).length === 2, "ข้อความซ้ำคนละกิ่ง = คนละกล่อง (ต้นไม้ ไม่รวมกล่อง)");
+  const r = parseText("หัวข้อ\n  กิ่ง\nหัวข้อที่สอง", "mindmap");
+  ck(r.error && r.error.line === 3 && /ย่อหน้า/.test(r.error.hint), "หัวข้อกลางสองบรรทัด บอกบรรทัดที่เกินพร้อมวิธีแก้", r.error && r.error.message);
+  const tree = mm_("ของใหญ่ไหม?\n  ใหญ่: ด่วนไหม?\n    ด่วน: รถเหมา\n    ไม่ด่วน: ขนส่งใหญ่\n  เล็ก: ไปรษณีย์");
+  ck(tree.startsWith("flowchart LR"), "มีแต่คำถามซ้อนคำถาม = ต้นไม้ตัดสินใจ ซ้ายไปขวา");
+  const notTree = mm_("รับเรื่อง\nของใหญ่ไหม?\n  ใหญ่: ด่วนไหม?\n    ด่วน: รถเหมา\n    ไม่ด่วน: ขนส่งใหญ่\n  เล็ก: ไปรษณีย์");
+  ck(notTree.startsWith("flowchart TD"), "มีขั้นทำงานที่ไม่ใช่คำถามคั่น = ผังขั้นตอนเดิม บนลงล่าง");
+  ck(mm_("ผัง: ขั้นตอน\nทิศ: บนลงล่าง\nของใหญ่ไหม?\n  ใหญ่: ด่วนไหม?\n    ด่วน: ก\n    ไม่: ข\n  เล็ก: ค").startsWith("flowchart TD"), "เขียน ทิศ: เองชนะกฎต้นไม้ตัดสินใจ");
+  ck(mm_("เริ่ม\nได้ไหม?\n  ได้: จบงาน\n  ไม่ได้: แก้").startsWith("flowchart TD"), "คำถามข้อเดียวยังเป็นผังขั้นตอน");
 }
 
 console.log(`\n${fail.length ? "❌" : "✅"} ผ่าน ${pass} ข้อ, ตก ${fail.length} ข้อ`);

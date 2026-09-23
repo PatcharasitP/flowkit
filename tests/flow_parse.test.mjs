@@ -122,6 +122,7 @@ for (const f of goldens) {
   const name = f.replace(/\.txt$/, "");
   const res = parseText(readFileSync(join(G, f), "utf8"), kindOfFile(name));
   if (res.error) { ck(false, `${name} อ่านได้`, `บรรทัด ${res.error.line}: ${res.error.message}`); continue; }
+  if (res.model.kind === "table" || res.model.kind === "mindmap") continue;   // ตารางไม่ใช่กราฟ mind map ไม่ใช่ flowchart ไม่มีเฉลยแบบนี้ (เช็คในชุดของตัวเอง)
   const want = readMermaid(readFileSync(join(G, name + ".mmd"), "utf8"));
   const d = diff(shapeOfGraph(want.nodes, want.edges, want.groupOf), fromModel(res.model));
   ck(d.length === 0, `${name} ได้กล่อง ${res.model.nodes.length} เส้น ${res.model.edges.length} ตรงกับคำตอบ`, d.slice(0, 6).join("\n      "));
@@ -225,10 +226,10 @@ console.log("\n━━ ④ ตัวอย่างที่เปิดมาเ
   }
 }
 
-console.log("\n━━ ⑤ เทมเพลต 10 ใบ กับคำสั่งให้ AI ช่วยร่าง (แผนเฟส 5 + v3 เฟส 2 ผังลู่ 2 ใบ) ━━");
+console.log("\n━━ ⑤ เทมเพลต 15 ใบ กับคำสั่งให้ AI ช่วยร่าง (แผนเฟส 5 + v3 ผังลู่ 2 ตาราง 3 ความคิด 1 ต้นไม้ตัดสินใจ 1) ━━");
 {
   const { TEMPLATES } = await imp("src/templates.js");
-  ck(TEMPLATES.length === 10 && new Set(TEMPLATES.map((t) => t.kind)).size === 5, `เทมเพลต 10 ใบ ครบ 5 ชนิดผัง (${TEMPLATES.length} ใบ)`);
+  ck(TEMPLATES.length === 15 && new Set(TEMPLATES.map((t) => t.kind)).size === 7, `เทมเพลต 15 ใบ ครบ 7 ชนิดผัง (${TEMPLATES.length} ใบ)`);
   for (const t of TEMPLATES) for (const lang of ["th", "en"]) {
     const r = parseText(t.text[lang], t.kind);
     ck(r.model && !r.error && r.model.warnings.length === 0 && r.model.kind === t.kind && r.model.nodes.length >= 4,

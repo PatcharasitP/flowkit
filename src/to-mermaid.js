@@ -54,6 +54,7 @@ function direction(m) {
     const leaves = m.nodes.filter((n) => !hasChild.has(n.id)).length;
     return leaves > ORG_LEAVES_LR ? "LR" : "TD";
   }
+  if (isDecisionTree(m)) return "LR";
   return "TD";    // ขั้นตอนกับระบบ บนลงล่างเสมอ (ขั้นตอนซ้ายไปขวาได้ 4,293px , ระบบซ้ายไปขวาป้ายทับกัน H5)
 }
 
@@ -66,7 +67,33 @@ export function edgeElbow(m) {
 
 const ARROW = { solid: "-->", dashed: "-.->", plain: "---", both: "<-->" };
 
+/** ผังขั้นตอนที่ทุกกล่องที่มีทางไปต่อเป็นคำถาม (มีคำถามอย่างน้อย 2 ข้อ) = ต้นไม้ตัดสินใจ วางซ้ายไปขวา (แผน v3 เฟส 6)
+ *  ต้นไม้ตัดสินใจลึกไม่กี่ชั้นแต่แตกกิ่งเยอะ บนลงล่างจึงกว้างเกินจอ ส่วนผังขั้นตอนทั่วไปยังบนลงล่าง (ซ้ายไปขวากว้าง 4,293px) */
+export function isDecisionTree(m) {
+  if (m.kind !== "steps" || m.groups.length) return false;
+  const from = new Set(m.edges.map((e) => e.from));
+  const asks = m.nodes.filter((n) => n.shape === "ask");
+  return asks.length >= 2 && m.nodes.every((n) => !from.has(n.id) || n.shape === "ask");
+}
+
+/** แผนผังความคิด (แผน v3 เฟส 6) ‼️ ข้อความต้องหนีอักขระแบบ #40; เสมอ: mindmap ของ Mermaid อ่าน ( ) เป็นรูปทรงแม้อยู่ในเครื่องหมายคำพูด
+ *  "การเงิน (ภาษี)" เหลือแค่ "ภาษี" (ยิงจริง 23/09/2026 .claude/evidence/flowkit-v3-2026-09-23/phase6/mm_probe.py) */
+function toMindmap(m) {
+  const kids = new Map();
+  for (const e of m.edges) (kids.get(e.from) || kids.set(e.from, []).get(e.from)).push(e.to);
+  const byId = new Map(m.nodes.map((n) => [n.id, n]));
+  const out = ["mindmap"];
+  const walk = (id, depth) => {
+    const n = byId.get(id), t = esc(n.text.replace(/\s*\|\s*/g, " "));
+    out.push(`${"  ".repeat(depth + 1)}${id}${depth ? `["${t}"]` : `("${t}")`}`);
+    for (const k of kids.get(id) || []) walk(k, depth + 1);
+  };
+  if (m.nodes[0]) walk(m.nodes[0].id, 0);
+  return out.join("\n") + "\n";
+}
+
 export function toMermaid(m) {
+  if (m.kind === "mindmap") return toMindmap(m);
   const out = [`flowchart ${direction(m)}`];
   const outgoing = new Set(m.edges.map((e) => e.from));
   const first = m.nodes[0] ? m.nodes[0].id : null;

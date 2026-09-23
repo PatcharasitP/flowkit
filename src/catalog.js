@@ -10,6 +10,8 @@ export const KINDS = [
   { id: "org", th: "องค์กร", en: "Org chart" },
   { id: "system", th: "ระบบ", en: "Systems" },
   { id: "timeline", th: "ไทม์ไลน์", en: "Timeline" },
+  { id: "table", th: "ตาราง", en: "Table" },
+  { id: "mindmap", th: "ความคิด", en: "Mind map" },
   { id: "pa", th: "Power Automate", en: "Power Automate" },
   { id: "other", th: "ทางเข้าอื่น", en: "Other ways in" },
 ];
@@ -34,6 +36,11 @@ const TPL_KEYS = {
   purchasing: "จัดซื้อ ซื้อ ผู้รับผิดชอบ เลน swimlane purchase procurement role",
   "lane-approval": "อนุมัติ ข้ามฝ่าย วงเงิน จัดซื้อ การเงิน ลู่ swimlane approval handoff",
   "lane-complaint": "ร้องเรียน ลูกค้า ช่าง call center ลู่ swimlane complaint technician",
+  "table-authority": "อำนาจ อนุมัติ วงเงิน raci ตำแหน่ง authority approval matrix",
+  "table-priority": "ด่วน สำคัญ eisenhower จัดลำดับ สี่ช่อง priority urgent important",
+  "table-journey": "ลูกค้า เส้นทาง journey ความรู้สึก ช่องทาง customer experience",
+  "mindmap-project": "ระดมสมอง ไอเดีย โครงการ สาขา brainstorm project mind map",
+  "decision-shipping": "ตัดสินใจ ต้นไม้ decision tree เลือก ขนส่ง ส่งของ shipping choose",
   renewal: "สัญญา เช่า ต่ออายุ lease contract renew",
   sla: "sla เวลา ซ่อม ภายใน deadline repair",
   team: "ทีม โครงสร้าง ผัง องค์กร หัวหน้า team structure",
@@ -47,6 +54,8 @@ export const CATALOG = [
   blank("org", "ผังองค์กร", "Org chart", "organization องค์กร ทีม หัวหน้า ลูกน้อง hierarchy"),
   blank("system", "ผังระบบ", "Systems diagram", "system ระบบ ข้อมูล ส่งต่อ data flow architecture"),
   blank("timeline", "ไทม์ไลน์", "Timeline", "timeline แผนงาน ช่วงเวลา ลำดับเวลา roadmap schedule"),
+  blank("table", "ตาราง", "Table", "ตาราง อำนาจ อนุมัติ raci matrix สี่ช่อง eisenhower journey เส้นทางลูกค้า table", "2026-09-23"),
+  blank("mindmap", "แผนผังความคิด", "Mind map", "mind map mindmap ความคิด ระดมสมอง brainstorm ไอเดีย หัวข้อ กิ่ง", "2026-09-23"),
   blank("pa", "flow ของ Power Automate", "Power Automate flow", "power automate flow json definition cloud flow โฟลว์", "2026-09-22"),
   ...TEMPLATES.map((t) => ({
     id: `tpl-${t.id}`, group: "template", kind: t.kind, icon: t.kind, href: `draw/?tpl=${t.id}`,
@@ -60,6 +69,8 @@ export const CATALOG = [
 
 /** ไอคอนเส้นบาง 7 แบบ (24x24 เส้นอย่างเดียว สีจาก currentColor ผ่าน .ico-svg ของ FileKit) */
 export const ICONS = {
+  mindmap: '<circle cx="12" cy="12" r="3"/><path d="M9.3 10.6L6 8M14.7 10.6L18 8M9.3 13.4L6 16M14.7 13.4L18 16"/><circle cx="4.5" cy="7" r="1.8"/><circle cx="19.5" cy="7" r="1.8"/><circle cx="4.5" cy="17" r="1.8"/><circle cx="19.5" cy="17" r="1.8"/>',
+  table: '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9h18M3 14.5h18M9 4v16M15 4v16"/>',
   lane: '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 9.4h18M3 14.7h18M7.5 4v16"/><rect x="9.5" y="5.6" width="4.5" height="2.3" rx=".6"/><rect x="15" y="16.2" width="4.5" height="2.3" rx=".6"/><path d="M14 6.8h2.6v9.4"/>',
   steps: '<rect x="3" y="3" width="8" height="5" rx="1.5"/><path d="M7 8v3"/><path d="M7 11l4 3.5-4 3.5-4-3.5z"/><path d="M11 14.5h4"/><rect x="15" y="12" width="6" height="5" rx="1.5"/>',
   org: '<rect x="9" y="3" width="6" height="4.5" rx="1.2"/><path d="M12 7.5v3M6 10.5h12M6 10.5v3M18 10.5v3"/><rect x="3" y="13.5" width="6" height="4.5" rx="1.2"/><rect x="15" y="13.5" width="6" height="4.5" rx="1.2"/>',

@@ -108,6 +108,58 @@ export const TEMPLATES = [
         "Power BI report -> [Report] Executive slides: exported images", "Power Automate --> Semantic model: triggers refresh"),
     },
   },
+  /* ผังตาราง 3 ใบ (แผน v3 เฟส 5) ใบละแบบ */
+  {
+    id: "table-authority", kind: "table",
+    title: { th: "อำนาจอนุมัติจัดซื้อ", en: "Purchase approval authority" },
+    text: {
+      th: L("งาน \\ ตำแหน่ง: เจ้าหน้าที่, หัวหน้างาน, ผู้จัดการฝ่าย, กรรมการผู้จัดการ", "ซื้อไม่เกิน 10,000: ทำ, อนุมัติ, -, -",
+        "ซื้อ 10,001 ถึง 100,000: ทำ, ตรวจ, อนุมัติ, -", "ซื้อเกิน 100,000: ทำ, ตรวจ, ตรวจ, อนุมัติ", "เพิ่มผู้ขายรายใหม่: ทำ, ตรวจ, อนุมัติ, รับทราบ"),
+      en: L("Task \\ Role: Officer, Team lead, Department manager, Managing director", "Buy up to 10,000: do, approve, -, -",
+        "Buy 10,001 to 100,000: do, review, approve, -", "Buy over 100,000: do, review, review, approve", "Add a new vendor: do, review, approve, informed"),
+    },
+  },
+  {
+    id: "table-priority", kind: "table",
+    title: { th: "จัดลำดับงาน ด่วน สำคัญ", en: "Urgent or important" },
+    text: {
+      th: L("แกนนอน: ด่วน | ไม่ด่วน", "แกนตั้ง: สำคัญ | ไม่สำคัญ", "ด่วน+สำคัญ: ทำเองทันที, แก้ปัญหาลูกค้า", "ไม่ด่วน+สำคัญ: นัดเวลาทำ, วางแผนปีหน้า",
+        "ด่วน+ไม่สำคัญ: มอบหมายคนอื่น, ตอบอีเมลทั่วไป", "ไม่ด่วน+ไม่สำคัญ: ตัดทิ้ง"),
+      en: L("x: Urgent | Not urgent", "y: Important | Not important", "Urgent+Important: Do it now, Fix customer issues", "Not urgent+Important: Schedule it, Plan next year",
+        "Urgent+Not important: Delegate, Routine email", "Not urgent+Not important: Drop it"),
+    },
+  },
+  {
+    id: "table-journey", kind: "table",
+    title: { th: "เส้นทางลูกค้าออนไลน์", en: "Online customer journey" },
+    text: {
+      th: L("ช่วง: รู้จัก, สนใจ, ตัดสินใจ, ใช้งาน", "ทำอะไร: เห็นโฆษณา, เข้าเว็บ, สั่งซื้อ, รับของ", "รู้สึก: เฉย ๆ, อยากรู้, กังวลเรื่องราคา, พอใจ",
+        "ช่องทาง: โซเชียล, เว็บไซต์, แชท, ขนส่ง", "เราทำอะไรได้: โฆษณาตรงกลุ่ม, รีวิวจริง, โปรส่งฟรี, ติดตามพัสดุ"),
+      en: L("stages: Aware, Interested, Decide, Use", "Doing: Sees an ad, Visits the site, Orders, Receives it", "Feeling: Neutral, Curious, Worried about price, Happy",
+        "Channel: Social, Website, Chat, Delivery", "What we can do: Targeted ads, Real reviews, Free shipping, Parcel tracking"),
+    },
+  },
+  /* แผนผังความคิดกับต้นไม้ตัดสินใจ (แผน v3 เฟส 6) ต้นไม้ตัดสินใจคือผังขั้นตอนที่มีแต่คำถาม วางซ้ายไปขวาเอง (to-mermaid.js isDecisionTree) */
+  {
+    id: "mindmap-project", kind: "mindmap",
+    title: { th: "ระดมความคิดโครงการ", en: "Project brainstorm" },
+    text: {
+      th: L("เปิดสาขาใหม่", "  ทำเล", "    ใกล้ลูกค้าเดิม", "    ที่จอดรถ", "  คน", "    จ้างคนในพื้นที่", "    อบรมก่อนเปิด 2 สัปดาห์",
+        "  เงิน", "    งบตกแต่ง", "    คืนทุนภายใน 18 เดือน", "  การตลาด", "    เปิดตัวในโซเชียล", "    โปรเปิดร้าน"),
+      en: L("Open a new branch", "  Location", "    Near current customers", "    Parking", "  People", "    Hire locally", "    Train 2 weeks before opening",
+        "  Money", "    Fit out budget", "    Pay back within 18 months", "  Marketing", "    Social launch", "    Opening promotion"),
+    },
+  },
+  {
+    id: "decision-shipping", kind: "steps",
+    title: { th: "ต้นไม้ตัดสินใจ เลือกวิธีส่งของ", en: "Decision tree: how to ship" },
+    text: {
+      th: L("ของชิ้นใหญ่ไหม?", "  ใหญ่: ต้องถึงภายในวันเดียวไหม?", "    ต้องถึง: รถเหมาเฉพาะคัน", "    ไม่ต้อง: ขนส่งพัสดุใหญ่",
+        "  ไม่ใหญ่: เป็นของแตกง่ายไหม?", "    แตกง่าย: ส่งด่วนพร้อมประกัน", "    ไม่แตก: ไปรษณีย์ธรรมดา"),
+      en: L("Is it big?", "  Big: Must it arrive today?", "    Today: Dedicated truck", "    Not today: Freight service",
+        "  Small: Is it fragile?", "    Fragile: Express with insurance", "    Not fragile: Standard post"),
+    },
+  },
   {
     id: "weekly", kind: "timeline",
     title: { th: "แผนงานรายสัปดาห์", en: "Weekly plan" },

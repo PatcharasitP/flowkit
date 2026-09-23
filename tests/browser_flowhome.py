@@ -149,19 +149,19 @@ def main():
         pg.goto(HOME); home_ready(pg); pg.wait_for_timeout(600)
         cat = pg.evaluate(CATALOG_JS); tpls = pg.evaluate(TEMPLATES_JS)
         ids = pg.evaluate("() => [...document.querySelectorAll('#tools a.pill')].map((e) => e.dataset.id)")
-        ck(f"การ์ดครบ {len(cat)} ใบ เรียงตาม catalog.js", len(cat) == 18 and ids == [c["id"] for c in cat], f"{len(ids)} {ids[:4]}")
+        ck(f"การ์ดครบ {len(cat)} ใบ เรียงตาม catalog.js", len(cat) == 25 and ids == [c["id"] for c in cat], f"{len(ids)} {ids[:4]}")
         hrefs = pg.evaluate("() => [...document.querySelectorAll('#tools a.pill')].map((e) => e.getAttribute('href'))")
         ck("การ์ดเป็นลิงก์ธรรมดาไปหน้าวาดพร้อมพารามิเตอร์", hrefs == [c["href"] for c in cat])
         ck("ไม่มี error และ CSP ไม่ปฏิเสธอะไร", not errs and not pg.evaluate("() => window.__csp || []"), f"{errs[:2]} {pg.evaluate('() => window.__csp || []')[:2]}")
         heads = pg.evaluate("() => [...document.querySelectorAll('#tools .pill-group')].map((e) => e.textContent.trim())")
         ck("สามกลุ่ม เริ่มจากหน้าว่าง เทมเพลต ทางเข้าอื่น", heads == ["เริ่มจากหน้าว่าง", "เทมเพลต", "ทางเข้าอื่น"], str(heads))
-        ck("ป้าย ใหม่ อยู่บนการ์ดผังลู่ Power Automate กับ AI (ตามวันที่ since)", pg.evaluate("() => [...document.querySelectorAll('#tools a.pill .new')].map((e) => e.closest('a').dataset.id).join(',')") in ("lane,pa,ai", "lane", ""),
+        ck("ป้าย ใหม่ อยู่บนการ์ดชนิดใหม่ (ลู่ ตาราง ความคิด) Power Automate กับ AI (ตามวันที่ since)", pg.evaluate("() => [...document.querySelectorAll('#tools a.pill .new')].map((e) => e.closest('a').dataset.id).join(',')") in ("lane,table,mindmap,pa,ai", "lane,table,mindmap", ""),
            pg.evaluate("() => [...document.querySelectorAll('#tools a.pill .new')].map((e) => e.closest('a').dataset.id).join(',')"))
 
         # ── ② กรองหมวด ตัวเลขตรงของจริง ──
         print("\n━━ ② กรองหมวด ━━")
         cats = pg.evaluate("() => [...document.querySelectorAll('#cats .cat')].map((e) => [e.dataset.kind, +e.querySelector('b').textContent])")
-        ck(f"ปุ่มหมวด 8 ปุ่ม ทั้งหมด = {len(cat)}", len(cats) == 8 and cats[0] == ["all", len(cat)], str(cats))
+        ck(f"ปุ่มหมวด 10 ปุ่ม ทั้งหมด = {len(cat)}", len(cats) == 10 and cats[0] == ["all", len(cat)], str(cats))
         bad = []
         for kind, n in cats[1:]:
             pg.click(f'#cats .cat[data-kind="{kind}"]')
