@@ -47,16 +47,55 @@ def expect(pg, text):
     """ผลที่ควรได้ คิดด้วยโมดูลตัวเดียวกับที่หน้าเว็บใช้ (ไม่เขียนตัวอ่านซ้ำใน Python)"""
     return pg.evaluate("""async (t) => { const { parseText } = await import('../src/parse.js');
         const r = parseText(t, 'steps'); if (!r.model) return null;
-        return { kind: r.model.kind, boxes: r.model.nodes.map((n) => n.text), groups: r.model.groups.map((g) => g.title) }; }""", text)
+        const title = new Map(r.model.groups.map((g) => [g.id, g.title]));
+        return { kind: r.model.kind, boxes: r.model.nodes.map((n) => n.text), groups: r.model.groups.map((g) => g.title),
+                 owner: Object.fromEntries(r.model.nodes.map((n) => [n.text, title.get(n.group) || ""])), edges: r.model.edges.length }; }""", text)
 
 
-def render(pg, want_texts, ms=45000):
+def seen(xml, lane):
+    """ข้อความของทุกกล่องที่ตาเห็น ผังลู่ตัดกรอบลู่ (กล่องไม่มีข้อความ ชื่อฝ่ายอยู่ที่หัวลู่) ออก"""
+    return sorted(t for t, _ in cells(xml) if t or not lane)
+
+
+def lane_problems(xml, owner, n_edges):
+    """ผังลู่จาก XML ที่ส่งออกจริง (draw.io จัดรูป XML ใหม่ อ่านด้วย ElementTree):
+    กล่องอยู่ในลู่ของฝ่ายตัวเอง ไม่ล้นลู่ ไม่ทับกัน เส้นครบ  คืนรายการปัญหา (ว่าง = ผ่าน)"""
+    import xml.etree.ElementTree as ET
+    try: root = ET.fromstring(xml)
+    except Exception: return ["อ่าน XML ไม่ได้"]
+    geo, title, boxes, edges, bad = {}, {}, [], 0, []
+    for el in root.iter():
+        c = el if el.tag == "mxCell" else (el.find("mxCell") if el.tag == "UserObject" else None)
+        if c is None: continue
+        g = c.find("mxGeometry"); cid = el.get("id")
+        if cid is None: continue                     # mxCell ข้างใน UserObject (นับที่ตัว UserObject แล้ว)
+        if c.get("edge") == "1" and c.get("source") and c.get("target"): edges += 1
+        if c.get("vertex") != "1" or g is None: continue
+        f = lambda k: float(g.get(k, 0) or 0)
+        geo[cid] = (c.get("parent"), f("x"), f("y"), f("width"), f("height"))
+        if cid.startswith("H"): title["L" + cid[1:]] = el.get("value") or c.get("value") or ""
+        if (el.get("mermaidId") or "").startswith("n:"): boxes.append((cid, el.get("label", "")))
+    for cid, text in boxes:
+        lane, x, y, w, h = geo[cid]; L = geo.get(lane)
+        if not L: bad.append(f"{text} ไม่ได้อยู่ในลู่"); continue
+        if title.get(lane) != owner.get(text): bad.append(f"{text} อยู่ลู่ {title.get(lane)} แต่เป็นงานของ {owner.get(text)}")
+        if x < 0 or y < 0 or x + w > L[3] + 0.5 or y + h > L[4] + 0.5: bad.append(f"{text} ล้นลู่")
+    ab = [(t, geo[geo[c][0]][1] + geo[c][1], geo[geo[c][0]][2] + geo[c][2], geo[c][3], geo[c][4]) for c, t in boxes if geo.get(geo[c][0])]
+    for i in range(len(ab)):
+        for j in range(i + 1, len(ab)):
+            a, b = ab[i], ab[j]
+            if a[1] < b[1] + b[3] and b[1] < a[1] + a[3] and a[2] < b[2] + b[4] and b[2] < a[2] + a[4]: bad.append(f"{a[0]} ทับ {b[0]}")
+    if edges != n_edges: bad.append(f"เส้น {edges} จาก {n_edges}")
+    return bad
+
+
+def render(pg, want_texts, ms=45000, lane=False):
     """รอจนภาพบนจอมีข้อความครบตามที่คาด คืน (png, xml) ของรอบนั้น"""
     want = sorted(want_texts); waited = 0; png = b""; xml = ""
     while waited <= ms:
         if state(pg) == "ready" and not pg.evaluate("() => document.querySelector('#live').hasAttribute('data-busy')"):
             png = preview_png(pg); xml = drawio_xml(png) or ""
-            if sorted(t for t, _ in cells(xml)) == want: return png, xml
+            if seen(xml, lane) == want: return png, xml
         pg.wait_for_timeout(400); waited += 400
     return png, xml
 
@@ -112,6 +151,16 @@ def main():
                  '<mxGeometry height="100" width="200" x="0" as="geometry"/></mxCell></UserObject><UserObject label="ล้น" mermaidId="n:n1" id="3">'
                  '<mxCell vertex="1" parent="2"><mxGeometry height="50" width="80" x="150" y="20" as="geometry"/></mxCell></UserObject></root></mxGraphModel></diagram></mxfile>')
         ck("ตัวตรวจกรอบกลุ่มจับกล่องที่ล้นกรอบได้", outside_groups(spill) == ["ล้น"])
+        lane_xml = ('<mxGraphModel><root><mxCell id="L1" vertex="1" parent="1"><mxGeometry x="0" y="0" width="300" height="100" as="geometry"/></mxCell>'
+                    '<mxCell id="H1" value="บัญชี" vertex="1" parent="L1"><mxGeometry width="100" height="100" as="geometry"/></mxCell>'
+                    '<mxCell id="L2" vertex="1" parent="1"><mxGeometry x="0" y="100" width="300" height="100" as="geometry"/></mxCell>'
+                    '<mxCell id="H2" value="คลัง" vertex="1" parent="L2"><mxGeometry width="100" height="100" as="geometry"/></mxCell>'
+                    '<UserObject label="ตรวจ" mermaidId="n:n1" id="n1"><mxCell vertex="1" parent="L2"><mxGeometry x="120" y="20" width="80" height="40" as="geometry"/></mxCell></UserObject>'
+                    '<UserObject label="ส่ง" mermaidId="n:n2" id="n2"><mxCell vertex="1" parent="L2"><mxGeometry x="150" y="30" width="200" height="40" as="geometry"/></mxCell></UserObject>'
+                    '</root></mxGraphModel>')
+        got = lane_problems(lane_xml, {"ตรวจ": "บัญชี", "ส่ง": "คลัง"}, 1)
+        ck("ตัวตรวจผังลู่จับ กล่องผิดลู่ , ล้นลู่ , ทับกัน , เส้นขาด ได้ครบ 4 แบบ",
+           any("เป็นงานของ บัญชี" in x for x in got) and any("ล้นลู่" in x for x in got) and any("ทับ" in x for x in got) and any("เส้น 0" in x for x in got), str(got))
         return finish()
 
     files = sorted(GOLD.glob("*.txt"))
@@ -130,14 +179,21 @@ def main():
             if not ck(f"[{name}] ข้อความอ่านผ่าน", exp is not None):
                 continue
             set_text(pg, text)
-            png, xml = render(pg, exp["boxes"] + exp["groups"])
-            texts = sorted(t for t, _ in cells(xml))
+            lane = exp["kind"] == "lane"
+            png, xml = render(pg, exp["boxes"] + exp["groups"], lane=lane)
+            texts = seen(xml, lane)
             want = sorted(exp["boxes"] + exp["groups"])
             ck(f"[{name}] {exp['kind']} กล่อง {len(exp['boxes'])} กลุ่ม {len(exp['groups'])} ข้อความตรงทุกกล่อง", texts == want,
                f"ขาด {sorted(set(want) - set(texts))[:4]} เกิน {sorted(set(texts) - set(want))[:4]}")
             # ขนาดพิกเซลจริงของไฟล์ (อ่านจากหัว PNG) ไม่ใช่ naturalWidth ของหน้าจอ ซึ่งเปลี่ยนตามความละเอียดจอ (srcset 2x)
             size = [int.from_bytes(png[16:20], "big"), int.from_bytes(png[20:24], "big")] if png[:8] == b"\x89PNG\r\n\x1a\n" else [0, 0]
-            if exp["groups"]:
+            if lane:
+                # แผน v3 เฟส 2.4 (เดิมวางไว้เป็นชุด browser_flowlane แยก รวมไว้ที่นี่เพราะใช้หน้าและรอบวาดเดียวกัน)
+                bad = lane_problems(xml, exp["owner"], exp["edges"])
+                ck(f"[{name}] ทุกกล่องอยู่ในลู่ของฝ่ายตัวเอง ไม่ล้นลู่ ไม่ทับกัน เส้นครบ {exp['edges']} เส้น", not bad, " | ".join(bad[:4]))
+                cols = size[0] / 2
+                ck(f"[{name}] ภาพกว้าง {cols:.0f}px ที่ 1 เท่า ไม่เกิน 1,700px (ผังลู่ 7 คอลัมน์)", cols <= 1700)
+            elif exp["groups"]:
                 bad = outside_groups(xml)
                 ck(f"[{name}] ทุกกล่องอยู่ในกรอบกลุ่มของตัวเอง ไม่ล้นกรอบ", not bad, f"ล้น {bad}")
             got_sizes[name] = size
