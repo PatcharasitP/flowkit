@@ -124,9 +124,8 @@ function navDiff(a, b) {
     const o = b.find((x) => x[0] === n);
     if (!o) continue;
     if (!SELF.has(n) && o[1] !== h) out.push(`${n} ที่อยู่ ${h} กับ ${o[1]}`);
-    /* ‼️ ป้ายตอนชี้ (แบบ sqlbi 23/09/2026) ต้องมีสองภาษาครบ และตรงกันทั้งสองเว็บ */
-    if (!tip || !tipEn) out.push(`${n} ไม่มีป้ายครบสองภาษา (${tip} , ${tipEn})`);
-    if (o[2] !== tip || o[3] !== tipEn) out.push(`${n} ป้ายไม่ตรงกัน (${tip}|${tipEn} กับ ${o[2]}|${o[3]})`);
+    /* ‼️ ไม่มีป้ายตอนชี้ (พี่ปอนด์ 23/09/2026 "พวกนี้ไม่ต้องบรรยาย") ชื่อบนแถบพอแล้ว มีป้ายโผล่กลับมา = แดง */
+    if (tip || tipEn || o[2] || o[3]) out.push(`${n} มีป้ายตอนชี้ (${tip || o[2]}) แถบนี้ต้องไม่มีป้าย`);
   }
   return out;
 }
@@ -274,8 +273,7 @@ function selftest() {
   const nav = navOf(idx, "https://patcharasitp.github.io/flowkit/");
   ck(navDiff(nav, nav.filter((x) => x[0] !== "LearnKit")).length >= 1, "ลิงก์ในแถบเว็บในเครือหายหนึ่งตัว จับได้");
   ck(navDiff(nav, nav.map((x) => x[0] === "LearnKit" ? [x[0], "/filekit/#/x", x[2], x[3]] : x)).length === 1, "ลิงก์ชี้ผิดที่ จับได้");
-  ck(navDiff(nav, nav.map((x) => x[0] === "LearnKit" ? [x[0], x[1], "ป้ายอื่น", x[3]] : x)).length === 1, "ป้ายตอนชี้ไม่ตรงกันสองเว็บ จับได้");
-  ck(navDiff(nav.map((x) => x[0] === "LearnKit" ? [x[0], x[1], "", ""] : x), nav).length >= 1, "ป้ายตอนชี้หายไป จับได้");
+  ck(navDiff(nav, nav.map((x) => x[0] === "LearnKit" ? [x[0], x[1], "สมุดจดบทเรียน", x[3]] : x)).length === 1, "ป้ายตอนชี้โผล่กลับมา จับได้");
   ck(thaiNoEn('<body><p>ไทยไม่มีคำแปล</p><p data-en="x">ไทย</p><h1 data-en-html="a<em>b</em>">ก<em>ข</em></h1>').length === 1, "ข้อความไทยไม่มีคำแปล จับได้ (ลูกของ data-en-html ไม่นับ)");
   ck(Object.keys(vars("@media (x){\n:root{--a:1;}\n}", "@media (x){ :root{")).length === 1, "หาบล็อกสีเจอแม้จัดบรรทัดต่างกัน");
   ck(styleAttrs('<div style="--ac:red">').length === 1 && styleInJs('el.setAttribute("style", x)').length === 1

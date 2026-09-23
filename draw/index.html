@@ -26,7 +26,7 @@
 <meta name="theme-color" content="#101216" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f5f3" media="(prefers-color-scheme: light)">
 <link rel="canonical" href="https://patcharasitp.github.io/flowkit/draw/">
-<meta name="flowkit-version" content="flowkit-v8">
+<meta name="flowkit-version" content="flowkit-v9">
 <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/filekit/vendor/fonts/Sarabun-Regular.woff2">
@@ -129,12 +129,12 @@
 <!-- แถบเดียวกับหน้าแรกของ FileKit แต่ FlowKit เป็นตัวที่หนาอยู่ ลิงก์หมวดฝากหมวดไว้แล้วพาไปหน้าแรก FileKit
      ‼️ รายการต้องตรงกับหน้าแรก FileKit และหน้าแรก FlowKit (tests/accepts.test.mjs เทียบ) -->
 <!-- แถบเว็บในเครือ (พี่ปอนด์สั่ง 23/09/2026): เหลือ 3 เว็บ FileKit FlowKit LearnKit ตำแหน่งเดียวกันทุกเว็บ เปิดในแท็บเดิม
-     หน้าที่อยู่ = ตัวหนังสือขาวเต็ม , ไอคอนสีประจำเว็บเสมอ (น้ำเงิน ม่วง แอปเปิ้ลแดง) ‼️ แก้ที่หนึ่ง แก้ให้ครบ 4 หน้า FlowKit/tests/accepts.test.mjs เทียบ -->
+     หน้าที่อยู่ = ตัวหนังสือขาวเต็ม , ไอคอนสีประจำเว็บเสมอ (น้ำเงิน ม่วง แอปเปิ้ลแดง) , ชื่อติดกัน FileKit ไม่มีป้ายตอนชี้ (พี่ปอนด์: ไม่ต้องบรรยาย) ‼️ แก้ที่หนึ่ง แก้ให้ครบ 4 หน้า FlowKit/tests/accepts.test.mjs เทียบ -->
 <nav class="network" aria-label="เว็บในเครือ" data-en-al="Sister sites">
   <ul class="sites">
-    <li><a href="/filekit/" aria-label="FileKit" data-tip="เครื่องมือจัดการไฟล์ 64 ตัว" data-tip-en="64 file tools"><svg class="ico ico-file" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M13 5h16l9 9v26a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z"/><path fill="#ffffff" fill-opacity=".5" d="M29 5v6a3 3 0 0 0 3 3h6z"/></svg><span>File</span><b>Kit</b></a></li>
-    <li><a class="self" aria-current="page" href="../" aria-label="FlowKit" data-tip="วาดผังจากข้อความ" data-tip-en="Diagrams from text"><svg class="ico ico-flow" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="12" rx="3.2" fill="currentColor"/><path d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><rect x="26" y="24" width="15" height="12" rx="3.2" fill="currentColor"/></svg><span>Flow</span><b>Kit</b></a></li>
-    <li><a href="/learnkit/" aria-label="LearnKit" data-tip="สมุดจดบทเรียนเห็นภาพ" data-tip-en="Visual lesson notebook"><svg class="ico ico-learn" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M24 16c-5-5-17-3.5-17 9.5 0 12 8.5 21 17 17.5 8.5 3.5 17-5.5 17-17.5 0-13-12-14.5-17-9.5z"/><path fill="#7fd49a" d="M25.5 12.5c4-5 10.5-5.5 12-4-2.5 4.5-7.5 6.5-12 4z"/></svg><span>Learn</span><b>Kit</b></a></li>
+    <li><a href="/filekit/" aria-label="FileKit"><svg class="ico ico-file" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M13 5h16l9 9v26a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z"/><path fill="#ffffff" fill-opacity=".5" d="M29 5v6a3 3 0 0 0 3 3h6z"/></svg><span>File</span><b>Kit</b></a></li>
+    <li><a class="self" aria-current="page" href="../" aria-label="FlowKit"><svg class="ico ico-flow" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="12" rx="3.2" fill="currentColor"/><path d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><rect x="26" y="24" width="15" height="12" rx="3.2" fill="currentColor"/></svg><span>Flow</span><b>Kit</b></a></li>
+    <li><a href="/learnkit/" aria-label="LearnKit"><svg class="ico ico-learn" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M24 16c-5-5-17-3.5-17 9.5 0 12 8.5 21 17 17.5 8.5 3.5 17-5.5 17-17.5 0-13-12-14.5-17-9.5z"/><path fill="#7fd49a" d="M25.5 12.5c4-5 10.5-5.5 12-4-2.5 4.5-7.5 6.5-12 4z"/></svg><span>Learn</span><b>Kit</b></a></li>
   </ul>
 </nav>
 

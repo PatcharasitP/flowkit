@@ -22,7 +22,7 @@
 <meta name="description" content="พิมพ์ขั้นตอนทีละบรรทัด ได้ผังงาน ผังองค์กร ผังระบบ หรือไทม์ไลน์ มีเทมเพลตงานบริษัทไทยให้เริ่ม ดาวน์โหลดเป็นภาพวางสไลด์ได้ทันที เปิดแก้ต่อใน draw.io ได้ ข้อความไม่ออกจากเครื่อง">
 <meta name="theme-color" content="#0f1220" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
-<meta name="flowkit-version" content="flowkit-v8">
+<meta name="flowkit-version" content="flowkit-v9">
 <!-- ‼️ preload ฟอนต์เฉพาะเน็ตเร็ว (ที่มาและตัวเลขที่วัด ดูคอมเมนต์เดียวกันในหน้าแรก FileKit 13/09 และ 19/09/2026)
      เน็ตช้า preload แย่งโหลดกับหน้าแล้วเห็นหน้าช้าลง , เน็ตเร็ว preload กันการ์ดตกบรรทัดตอนฟอนต์มาถึง
      ‼️ ต้องมี crossOrigin แม้ same-origin ไม่งั้นโหลดซ้ำ 2 รอบ (พิสูจน์ 22/09/2026 เฟส 0 R3) -->
@@ -140,12 +140,12 @@
 <footer><a href="https://github.com/PatcharasitP/flowkit" target="_blank" rel="noopener" data-en="Source code on GitHub">โค้ดทั้งหมดเปิดดูได้บน GitHub</a></footer>
 <!-- แถบเดียวกับหน้าแรก FileKit แต่ FlowKit เป็นตัวที่หนาอยู่ ‼️ รายการต้องตรงกับ FileKit (tests/accepts.test.mjs เทียบ) -->
 <!-- แถบเว็บในเครือ (พี่ปอนด์สั่ง 23/09/2026): เหลือ 3 เว็บ FileKit FlowKit LearnKit ตำแหน่งเดียวกันทุกเว็บ เปิดในแท็บเดิม
-     หน้าที่อยู่ = ตัวหนังสือขาวเต็ม , ไอคอนสีประจำเว็บเสมอ (น้ำเงิน ม่วง แอปเปิ้ลแดง) ‼️ แก้ที่หนึ่ง แก้ให้ครบ 4 หน้า FlowKit/tests/accepts.test.mjs เทียบ -->
+     หน้าที่อยู่ = ตัวหนังสือขาวเต็ม , ไอคอนสีประจำเว็บเสมอ (น้ำเงิน ม่วง แอปเปิ้ลแดง) , ชื่อติดกัน FileKit ไม่มีป้ายตอนชี้ (พี่ปอนด์: ไม่ต้องบรรยาย) ‼️ แก้ที่หนึ่ง แก้ให้ครบ 4 หน้า FlowKit/tests/accepts.test.mjs เทียบ -->
 <nav class="network" aria-label="เว็บในเครือ" data-en-al="Sister sites">
   <ul class="sites">
-    <li><a href="/filekit/" aria-label="FileKit" data-tip="เครื่องมือจัดการไฟล์ 64 ตัว" data-tip-en="64 file tools"><svg class="ico ico-file" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M13 5h16l9 9v26a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z"/><path fill="#ffffff" fill-opacity=".5" d="M29 5v6a3 3 0 0 0 3 3h6z"/></svg><span>File</span><b>Kit</b></a></li>
-    <li><a class="self" aria-current="page" href="./" aria-label="FlowKit" data-tip="วาดผังจากข้อความ" data-tip-en="Diagrams from text"><svg class="ico ico-flow" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="12" rx="3.2" fill="currentColor"/><path d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><rect x="26" y="24" width="15" height="12" rx="3.2" fill="currentColor"/></svg><span>Flow</span><b>Kit</b></a></li>
-    <li><a href="/learnkit/" aria-label="LearnKit" data-tip="สมุดจดบทเรียนเห็นภาพ" data-tip-en="Visual lesson notebook"><svg class="ico ico-learn" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M24 16c-5-5-17-3.5-17 9.5 0 12 8.5 21 17 17.5 8.5 3.5 17-5.5 17-17.5 0-13-12-14.5-17-9.5z"/><path fill="#7fd49a" d="M25.5 12.5c4-5 10.5-5.5 12-4-2.5 4.5-7.5 6.5-12 4z"/></svg><span>Learn</span><b>Kit</b></a></li>
+    <li><a href="/filekit/" aria-label="FileKit"><svg class="ico ico-file" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M13 5h16l9 9v26a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3z"/><path fill="#ffffff" fill-opacity=".5" d="M29 5v6a3 3 0 0 0 3 3h6z"/></svg><span>File</span><b>Kit</b></a></li>
+    <li><a class="self" aria-current="page" href="./" aria-label="FlowKit"><svg class="ico ico-flow" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="7" width="15" height="12" rx="3.2" fill="currentColor"/><path d="M14.5 19v7.5a3.5 3.5 0 0 0 3.5 3.5h7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><rect x="26" y="24" width="15" height="12" rx="3.2" fill="currentColor"/></svg><span>Flow</span><b>Kit</b></a></li>
+    <li><a href="/learnkit/" aria-label="LearnKit"><svg class="ico ico-learn" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M24 16c-5-5-17-3.5-17 9.5 0 12 8.5 21 17 17.5 8.5 3.5 17-5.5 17-17.5 0-13-12-14.5-17-9.5z"/><path fill="#7fd49a" d="M25.5 12.5c4-5 10.5-5.5 12-4-2.5 4.5-7.5 6.5-12 4z"/></svg><span>Learn</span><b>Kit</b></a></li>
   </ul>
 </nav>
 

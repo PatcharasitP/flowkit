@@ -296,16 +296,11 @@ html.in-room body{overflow:hidden}
    ระยะข้างลดจาก 20 เป็น 16 พิกเซล เพราะไอคอนทำให้แถบยาวขึ้น 42 พิกเซล แล้ว BKK Dashboard ตกบรรทัด (วัดจริงที่จอ 1280) */
 .sites a{position:relative; padding-inline:16px}
 .sites a .ico{width:17px; height:17px; flex:none; align-self:center; display:block}
-.sites a::after{content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 7px); transform:translateX(-50%);
-  background:#14161c; color:#eef1ff; border:1px solid rgba(255,255,255,.15); border-radius:7px; padding:5px 10px;
-  font-size:12.5px; font-weight:400; line-height:1.5; white-space:nowrap; letter-spacing:0; box-shadow:0 10px 24px -10px rgba(0,0,0,.7);
-  opacity:0; visibility:hidden; transition:opacity .12s ease}
-.sites a:hover::after,.sites a:focus-visible::after{opacity:1; visibility:visible}
-:root[lang="en"] .sites a::after{content:attr(data-tip-en)}
-@media (prefers-reduced-motion: reduce){ .sites a::after{transition:none} }
 /* 3 sites bar 23/09/2026 (see index.html comment) */
 .sites a{opacity:1; color:rgba(255,255,255,.64)}
 .sites a.self,.sites a:hover,.sites a:focus-visible{color:#fff}
 .sites .ico-file{color:#8fa0ff} .sites .ico-flow{color:#b59dff} .sites .ico-learn{color:#ff8a7c}
-@media (max-width:640px){ .network{display:block} .sites a{padding-inline:12px} .sites a::after{display:none} }
+.sites a span+b{margin-left:-.28em}   /* ชื่อติดกัน FileKit (พี่ปอนด์ 23/09/2026) ตัวบางกับตัวหนายังแยกน้ำหนัก */
+
+@media (max-width:640px){ .network{display:block} .sites a{padding-inline:12px} }
 
