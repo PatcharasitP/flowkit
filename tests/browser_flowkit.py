@@ -380,6 +380,11 @@ def main():
         ck("ไม่มีคำขอแบบส่งข้อมูล (POST หรืออื่น ๆ) ออกนอกเครื่องเลย", not outside, f"{[(m, u[:80]) for m, u, _ in outside[:3]]}")
         ck("ไม่มี WebSocket", not ws, str(ws[:2]))
         hosts = sorted({urllib.parse.urlsplit(u).netloc for _, u, _ in reqs if u.startswith("http") and not u.startswith(ORIGIN)})
+        # ‼️ 24/10/2026 ตัวฝัง draw.io รุ่น 32.6.3 ยิง GET log.diagrams.net/log?ping=1&v=...&host=embed.diagrams.net เมื่อ UA ไม่ใช่ headless
+        #    มีแค่เลขรุ่น ไม่มีข้อความผัง ยอมเฉพาะรูปนี้ คำขอแบบอื่นไป log.diagrams.net ยังแดง
+        logs = [u for _, u, _ in reqs if urllib.parse.urlsplit(u).netloc == "log.diagrams.net"]
+        if logs and all(re.fullmatch(r"https://log\.diagrams\.net/log\?ping=1&v=[\d.]+&host=embed\.diagrams\.net(&[dwm]=\d)*", u) for u in logs):
+            hosts = [h for h in hosts if h != "log.diagrams.net"]
         ck("คุยกับภายนอกแค่ draw.io กับฟอนต์ของ Google (ที่ draw.io ใช้วาด Sarabun)",
            set(hosts) <= {"embed.diagrams.net", "fonts.googleapis.com", "fonts.gstatic.com"}, str(hosts))
 
