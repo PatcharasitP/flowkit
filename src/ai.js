@@ -14,7 +14,8 @@ const RULES = {
     steps: [
       "หนึ่งบรรทัดคือหนึ่งขั้น เขียนชิดซ้ายเรียงลงมาตามลำดับ",
       "คำถามลงท้ายด้วย ? แล้วใต้คำถามย่อหน้า 2 วรรค เขียนเป็น คำตอบ: ขั้นถัดไป หนึ่งบรรทัดต่อหนึ่งคำตอบ",
-      "ขั้นที่ต่อจากคำตอบนั้น ย่อหน้าลึกลงไปอีก 2 วรรคใต้บรรทัดคำตอบ",
+      /* ‼️ วัดจริง 24/10/2026 Haiku 5.5 อ่านข้อนี้แล้วย่อหน้าลึกขึ้นทีละขั้นเป็นขั้นบันได ผังขั้นตอนกับผังลู่พังทั้งคู่ ต้องบอกให้ชัดว่าระดับเท่าเดิม */
+      "ขั้นที่ต่อจากคำตอบนั้น ย่อหน้าลึกลงไปอีก 2 วรรคใต้บรรทัดคำตอบ ขั้นถัด ๆ ไปในกิ่งเดียวกันย่อหน้าเท่าเดิมทุกบรรทัด ห้ามลึกขึ้นทีละขั้น (ลึกขึ้นได้เฉพาะใต้คำถามกับใต้บรรทัดคำตอบ)",
       "บรรทัดที่กลับมาชิดซ้าย คือจุดที่ทุกกิ่งมาบรรจบกัน",
       "คำว่า จบ บรรทัดเดียว = ปิดกิ่งนั้น , กลับไป: ข้อความของขั้นเดิมเป๊ะ ๆ = วนกลับ",
       "พร้อมกัน: แล้วย่อหน้างานที่ทำพร้อมกันไว้ข้างใต้ บรรทัดละงาน",
@@ -42,7 +43,7 @@ const RULES = {
     steps: [
       "One line is one step, written flush left, top to bottom in order",
       "A question ends with ?, and under it each answer is indented 2 spaces as answer: next step, one line per answer",
-      "Steps that follow an answer are indented 2 more spaces under that answer line",
+      "Steps that follow an answer are indented 2 more spaces under that answer line, and every later step in that branch keeps the same indent, never one level deeper per step (go deeper only under a question or an answer line)",
       "A line back at the left edge is where all open branches join again",
       "The word stop on its own line ends that branch , back to: exact text of an earlier step loops back",
       "parallel: with the parallel tasks indented under it, one per line",

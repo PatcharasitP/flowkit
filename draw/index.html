@@ -16,7 +16,7 @@
   style-src 'self';
   img-src 'self' data: blob:;
   font-src 'self';
-  connect-src 'self' blob:;
+  connect-src 'self' blob: https://api.anthropic.com;
   frame-src https://embed.diagrams.net;
   object-src 'none';
   base-uri 'self';
@@ -26,7 +26,7 @@
 <meta name="theme-color" content="#101216" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f5f3" media="(prefers-color-scheme: light)">
 <link rel="canonical" href="https://patcharasitp.github.io/flowkit/draw/">
-<meta name="flowkit-version" content="flowkit-v13">
+<meta name="flowkit-version" content="flowkit-v14">
 <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="/filekit/vendor/fonts/Sarabun-Regular.woff2">
@@ -146,18 +146,36 @@
   <p class="dlg-note" id="tpl-note" data-en="The text in the box is replaced, press Ctrl+Z in the box to bring it back">ข้อความในช่องพิมพ์จะถูกแทนที่ กด Ctrl+Z ในช่องพิมพ์เพื่อย้อนกลับได้</p>
 </dialog>
 
-<!-- ให้ AI ช่วยร่าง (แผนเฟส 5) เว็บไม่เรียก AI เอง แค่สร้างคำสั่งให้ก๊อปไปวาง -->
+<!-- ให้ AI ช่วยร่าง สองทาง: ① ร่างเลยด้วย key ของคนใช้ (แผนฝัง AI 24/10/2026 , src/ai-call.js) คำเล่าออกจากเครื่องเฉพาะตอนกดปุ่มร่าง
+     ไปที่ api.anthropic.com ตรง ไม่ผ่านเซิร์ฟเวอร์ใดของเรา ② คัดลอกคำสั่งไปวางเอง (แผนเฟส 5) ทางนี้เว็บไม่ส่งอะไรออก -->
 <dialog class="dlg" id="dlg-ai" aria-labelledby="ai-h">
   <button class="dlg-x" type="button" data-close aria-label="ปิด" data-en-al="Close">×</button>
   <h2 id="ai-h" data-en="Let an AI draft it">ให้ AI ช่วยร่าง</h2>
-  <label class="dlg-lbl" for="ai-desc" data-en="Describe the work you want as a diagram">เล่างานที่อยากได้เป็นผัง</label>
+  <label class="dlg-lbl" for="ai-desc" data-en="Describe the work, or what to change in the current diagram">เล่างานที่อยากได้เป็นผัง หรือบอกว่าอยากแก้อะไรในผังเดิม</label>
   <textarea class="dlg-ta" id="ai-desc" rows="3" data-en-ph="For example: petty cash claims go to the team lead, then accounting, anything over 5,000 needs the manager"
     placeholder="เช่น เบิกเงินสดย่อยต้องผ่านหัวหน้าแล้วบัญชี ถ้าเกิน 5,000 บาทต้องให้ผู้จัดการเซ็น"></textarea>
   <p class="dlg-kind" id="ai-kind"></p>
-  <textarea class="dlg-pre" id="ai-prompt" rows="6" readonly aria-label="คำสั่งที่จะคัดลอก" data-en-al="Prompt to copy"></textarea>
-  <button class="dlg-cta" id="ai-copy" type="button" data-en="Copy the prompt">คัดลอกคำสั่ง</button>
+  <div class="ai-direct" id="ai-direct">
+    <label class="dlg-lbl" for="ai-key" data-en="Your Claude API key">API key ของ Claude ของคุณ</label>
+    <input class="dlg-in" id="ai-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-..." aria-describedby="ai-keynote">
+    <label class="ai-opt"><input type="checkbox" id="ai-remember"> <span data-en="Remember the key in this browser">จำ key ไว้ในเบราว์เซอร์นี้</span></label>
+    <div class="ai-models" role="radiogroup" aria-label="รุ่น AI" data-en-al="AI model">
+      <label class="ai-opt"><input type="radio" name="ai-model" value="auto" checked> <span data-en="Auto (recommended)">อัตโนมัติ (แนะนำ)</span></label>
+      <label class="ai-opt"><input type="radio" name="ai-model" value="haiku"> <span data-en="Haiku, fast and cheap">Haiku เร็วและประหยัด</span></label>
+      <label class="ai-opt"><input type="radio" name="ai-model" value="opus"> <span data-en="Opus, most accurate">Opus แม่นที่สุด</span></label>
+    </div>
+    <button class="dlg-cta" id="ai-go" type="button" data-en="Draft the diagram">ร่างผังเลย</button>
+    <button class="dlg-cta dlg-cta2" id="ai-edit" type="button" data-en="Edit the diagram in the box as described">แก้ผังในช่องพิมพ์ตามที่เล่า</button>
+    <button class="linkbtn ai-stop" id="ai-stop" type="button" hidden data-en="Cancel">ยกเลิก</button>
+    <p class="dlg-note ai-status" id="ai-status" role="status"></p>
+    <p class="dlg-note" data-en="Auto uses Opus for process and swimlane diagrams, which branch, and Haiku for the rest.">อัตโนมัติใช้ Opus กับผังขั้นตอนและผังใครทำอะไรที่มีทางแยก ผังอื่นใช้ Haiku</p>
+    <p class="dlg-note" id="ai-keynote" data-en-html="When you press Draft, your description goes straight to Anthropic with your key, not through any FlowKit server, and is billed to your account. For confidential work, use made up names. No key yet? Create one in the &lt;a href=&quot;https://platform.claude.com/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Claude Console&lt;/a&gt;.">กดร่างแล้ว คำเล่างานจะถูกส่งตรงไป Anthropic ด้วย key ของคุณ ไม่ผ่านเซิร์ฟเวอร์ของ FlowKit และคิดเงินจากบัญชีของคุณ ถ้าเป็นงานลับให้ใช้ชื่อสมมติ ยังไม่มี key สร้างได้ที่ <a href="https://platform.claude.com/" target="_blank" rel="noopener">Claude Console</a></p>
+  </div>
+  <p class="ai-or" data-en="Or copy the prompt into any AI chat yourself">หรือคัดลอกคำสั่งไปวางในแชท AI เอง</p>
+  <textarea class="dlg-pre" id="ai-prompt" rows="4" readonly aria-label="คำสั่งที่จะคัดลอก" data-en-al="Prompt to copy"></textarea>
+  <button class="dlg-cta dlg-cta2" id="ai-copy" type="button" data-en="Copy the prompt">คัดลอกคำสั่ง</button>
   <p class="dlg-note" id="ai-done" role="status"></p>
-  <p class="dlg-note" data-en="Paste it into any AI chat you trust, then copy the answer back into the FlowKit box. FlowKit sends nothing to any AI itself. For confidential work, use made up names.">วางในแชท AI ตัวไหนก็ได้ที่ไว้ใจ แล้วคัดลอกคำตอบกลับมาวางในช่องพิมพ์ของ FlowKit ตัวเว็บไม่ได้ส่งอะไรให้ AI เอง ถ้าเป็นงานลับให้ใช้ชื่อสมมติ</p>
+  <p class="dlg-note" data-en="Paste it into any AI chat you trust, then copy the answer back into the FlowKit box. This way FlowKit sends nothing to any AI itself. For confidential work, use made up names.">วางในแชท AI ตัวไหนก็ได้ที่ไว้ใจ แล้วคัดลอกคำตอบกลับมาวางในช่องพิมพ์ของ FlowKit ทางนี้ตัวเว็บไม่ได้ส่งอะไรให้ AI เอง ถ้าเป็นงานลับให้ใช้ชื่อสมมติ</p>
 </dialog>
 
 <!-- หน้าตาผัง (แผน v3 เฟส 1 , src/defaults.js) ทุกข้อเปิดอยู่ ปิดทีละข้อได้ จำค่าไว้ในเบราว์เซอร์นี้ -->

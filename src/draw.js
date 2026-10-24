@@ -18,6 +18,7 @@ import { createEditor } from "./editor.js";
 import { SAMPLES } from "./samples.js";
 import { TEMPLATES } from "./templates.js";
 import { buildPrompt, cleanAnswer } from "./ai.js";
+import { draftDiagram, AiError, pickModel } from "./ai-call.js";
 
 const $ = (s) => document.querySelector(s);
 const ta = $("#src"), hl = $("#hl"), hint = $("#hint"), msg = $("#msg");
@@ -639,15 +640,17 @@ ta.addEventListener("paste", (e) => {
 /* ── เทมเพลต กับ ให้ AI ช่วยร่าง (แผนเฟส 5) ── */
 const LANG_KEY = IS_EN ? "en" : "th";
 /** ใส่เทมเพลตลงช่องพิมพ์ (ปุ่มในหน้าต่างเทมเพลต และการ์ดหน้าแรก ?tpl=) เลือกเทมเพลต = เริ่มผังใหม่ */
-function useTemplate(t) {
+/** ข้อความใหม่ทั้งช่อง (เทมเพลต , ผังที่ AI ร่าง) ผังที่แก้ด้วยมือค้างอยู่ถือว่าเริ่มผังใหม่ */
+function replaceAll(text, k) {
   if (edited) { edited = null; savedRecord = null; writeRecord(null); paintEditNote(); }
-  if (kind !== t.kind) setKind(t.kind);
+  if (k && kind !== k) setKind(k);
   ta.focus(); ta.select();
-  insert(t.text[LANG_KEY]);                       // insertText = กด Ctrl+Z ในช่องพิมพ์แล้วได้ข้อความเดิมคืน
+  insert(text);                                   // insertText = กด Ctrl+Z ในช่องพิมพ์แล้วได้ข้อความเดิมคืน
   announceNext = true;
   update();
   showDiagramOnPhone();
 }
+function useTemplate(t) { replaceAll(t.text[LANG_KEY], t.kind); }
 for (const d of document.querySelectorAll(".dlg")) {
   d.addEventListener("click", (e) => { if (e.target === d || e.target.closest("[data-close]")) d.close(); });   // กดพื้นมืดรอบนอกก็ปิด
 }
@@ -710,6 +713,54 @@ for (const d of document.querySelectorAll(".dlg")) {
     catch { pre.focus(); pre.select(); document.execCommand("copy"); }
     done.textContent = tr("คัดลอกแล้ว วางในแชท AI ได้เลย", "Copied, paste it into the AI chat");
   });
+
+  /* ร่างเลยด้วย key ของคนใช้ (แผนฝัง AI 24/10/2026 , src/ai-call.js)
+     ‼️ key อยู่ในตัวแปรของแท็บเป็นค่าเริ่มต้น ลง localStorage เฉพาะตอนติ๊กจำ เอาติ๊กออก = ลบทันที
+     ‼️ ไม่มีคำขอออกจนกว่าจะกดปุ่ม เทสข้อความไม่ออกจากเครื่องเดิมยังต้องผ่านเมื่อไม่ได้กด */
+  const KEY_STORE = "flowkit.aiKey", MODEL_STORE = "flowkit.aiModel";
+  const keyIn = $("#ai-key"), remember = $("#ai-remember"), go = $("#ai-go"), stop = $("#ai-stop"), status = $("#ai-status");
+  const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch { return null; } };
+  const models = [...dlg.querySelectorAll('input[name="ai-model"]')];
+  if (store(KEY_STORE)) { keyIn.value = store(KEY_STORE); remember.checked = true; }
+  for (const r of models) {
+    if (r.value === store(MODEL_STORE)) r.checked = true;
+    r.addEventListener("change", () => store(MODEL_STORE, r.value));
+  }
+  const keep = () => store(KEY_STORE, remember.checked ? keyIn.value.trim() : null);
+  remember.addEventListener("change", keep);
+  keyIn.addEventListener("change", keep);
+  const say = (text, bad) => { status.textContent = text; if (bad) status.dataset.tone = "bad"; else delete status.dataset.tone; };
+  let ctl = null;
+  const edit = $("#ai-edit");
+  /** edit = แก้ผังในช่องพิมพ์ (เฟส 3) ส่งผังเดิมไปด้วย ไม่งั้นร่างใหม่ */
+  async function run(isEdit) {
+    if (ctl) return;
+    if (isEdit && !ta.value.trim()) { say(tr("ช่องพิมพ์ยังไม่มีผังให้แก้ กด ร่างผังเลย แทน", "The box has no diagram to edit yet, use Draft instead"), true); return; }
+    const model = models.find((r) => r.checked).value;
+    ctl = new AbortController();
+    go.disabled = edit.disabled = true; stop.hidden = false;
+    /* เวลาวัดจริง 24/10/2026: Haiku กลาง 7 วินาที Opus กลาง 8.5 ช้าสุด 18 */
+    const NAME = { haiku: "Haiku", opus: "Opus" }, use = pickModel(model, kind);
+    say(tr(`${NAME[use]} กำลังร่าง ${use === "opus" ? "ราว 10 ถึง 20 วินาที" : "ราว 5 ถึง 10 วินาที"}`, `${NAME[use]} is drafting, about ${use === "opus" ? "10 to 20" : "5 to 10"} seconds`));
+    try {
+      const r = await draftDiagram({ key: keyIn.value, model, kind, description: desc.value, current: isEdit ? ta.value : "", lang: LANG_KEY, signal: ctl.signal });
+      const usd = r.usd < 0.01 ? r.usd.toFixed(4) : r.usd.toFixed(3);
+      say(r.error ? tr(`ร่างล่าสุด (${NAME[r.model]}) มีบรรทัดที่ต้องแก้เอง ดูที่ช่องพิมพ์ ใช้ไปราว ${usd} ดอลลาร์`, `The last draft (${NAME[r.model]}) has a line to fix, see the text box. Cost about $${usd}`)
+                  : tr(`ร่างล่าสุด (${NAME[r.model]}) ใช้ไปราว ${usd} ดอลลาร์`, `The last draft (${NAME[r.model]}) cost about $${usd}`));
+      dlg.close();
+      replaceAll(r.text);
+    } catch (e) {
+      if (!(e instanceof AiError)) { console.warn("FlowKit", e); say(tr("ร่างไม่สำเร็จ ลองใหม่อีกครั้ง", "The draft failed, try again"), true); return; }
+      say(tr(e.th, e.en), e.code !== "cancel");
+      if (["nokey", "badkey", "auth"].includes(e.code)) keyIn.focus();
+      else if (e.code === "nodesc") desc.focus();
+    } finally {
+      ctl = null; go.disabled = edit.disabled = false; stop.hidden = true;
+    }
+  }
+  go.addEventListener("click", () => run(false));
+  edit.addEventListener("click", () => run(true));
+  stop.addEventListener("click", () => { if (ctl) ctl.abort(); });
 }
 
 ta.addEventListener("input", () => {
